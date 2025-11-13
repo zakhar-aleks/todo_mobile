@@ -1,10 +1,12 @@
 import AppButton from "./AppButton";
+import Avatar from "./Avatar";
 import Input from "./Input";
 import { StyleSheet, View } from "react-native";
 
 const SignUp = () => {
 	return (
 		<View style={styles.container}>
+			<Avatar />
 			<View style={styles.inputContainer}>
 				<Input label="Email" />
 				<Input label="Name" />
@@ -26,7 +28,7 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		alignItems: "center",
 		backgroundColor: "#6871EE",
-		gap: 29,
+		gap: 30,
 	},
 	inputContainer: {
 		gap: 11,
