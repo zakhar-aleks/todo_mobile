@@ -18,7 +18,7 @@ const Input = ({ label, isPassword = false, hasEye = false }: InputProps) => {
 	const [isSecure, setIsSecure] = useState(hasEye);
 
 	return (
-		<View style={styles.container}>
+		<View>
 			<Text style={styles.text}>{label}</Text>
 			<View style={styles.inputWrapper}>
 				<TextInput
@@ -39,9 +39,6 @@ const Input = ({ label, isPassword = false, hasEye = false }: InputProps) => {
 };
 
 const styles = StyleSheet.create({
-	container: {
-		marginTop: 32,
-	},
 	text: {
 		color: "#C4C8F9",
 		fontSize: 14,
