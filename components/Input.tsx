@@ -6,24 +6,27 @@ import {
 	StyleSheet,
 	TouchableOpacity,
 	Image,
+	TextInputProps,
 } from "react-native";
 
-interface InputProps {
+interface InputProps extends TextInputProps {
 	label: string;
-	isPassword?: boolean;
 	hasEye?: boolean;
+	error?: string;
 }
 
-const Input = ({ label, isPassword = false, hasEye = false }: InputProps) => {
-	const [isSecure, setIsSecure] = useState(hasEye);
+const Input = ({ label, hasEye = false, error, ...props }: InputProps) => {
+	const [isSecure, setIsSecure] = useState(props.secureTextEntry);
 
 	return (
 		<View>
 			<Text style={styles.text}>{label}</Text>
-			<View style={styles.inputWrapper}>
+			<View style={[styles.inputWrapper, !!error && styles.errorBorder]}>
 				<TextInput
 					style={styles.input}
-					secureTextEntry={hasEye ? isSecure : isPassword}
+					{...props}
+					secureTextEntry={hasEye ? isSecure : props.secureTextEntry}
+					placeholderTextColor="#999"
 				/>
 				{hasEye && (
 					<TouchableOpacity onPress={() => setIsSecure(!isSecure)}>
@@ -34,6 +37,8 @@ const Input = ({ label, isPassword = false, hasEye = false }: InputProps) => {
 					</TouchableOpacity>
 				)}
 			</View>
+			{/* Display the error message */}
+			{error && <Text style={styles.errorText}>{error}</Text>}
 		</View>
 	);
 };
@@ -61,6 +66,15 @@ const styles = StyleSheet.create({
 		flex: 1,
 		color: "#FFFFFF",
 		height: "100%",
+	},
+	errorBorder: {
+		borderColor: "#FF5A5A",
+	},
+	errorText: {
+		color: "#FF5A5A",
+		fontSize: 12,
+		marginTop: 4,
+		marginLeft: 5,
 	},
 });
 

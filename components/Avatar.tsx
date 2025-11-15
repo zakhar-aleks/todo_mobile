@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { check, request, RESULTS, PERMISSIONS } from "react-native-permissions";
 import {
 	Alert,
@@ -7,8 +6,9 @@ import {
 	TouchableOpacity,
 	Platform,
 	StyleSheet,
+	Text,
 } from "react-native";
-import { launchImageLibrary } from "react-native-image-picker";
+import { launchImageLibrary, Asset } from "react-native-image-picker";
 
 const getGalleryPermission = () => {
 	if (Platform.OS === "ios") {
@@ -25,11 +25,15 @@ const getGalleryPermission = () => {
 	return null;
 };
 
-const Avatar = () => {
-	const [avatar, setAvatar] = useState<string | null>(null);
+interface AvatarProps {
+	value: Asset | null;
+	onChange: (file: Asset | null) => void;
+	error?: string;
+}
 
+const Avatar = ({ value, onChange, error }: AvatarProps) => {
 	const handleDeletePress = () => {
-		setAvatar(null);
+		onChange(null);
 	};
 
 	const openGallery = async () => {
@@ -39,19 +43,13 @@ const Avatar = () => {
 			selectionLimit: 1,
 		});
 
-		if (result.didCancel) {
-			return;
-		}
-
-		if (result.errorCode) {
-			Alert.alert(result.errorMessage!);
+		if (result.didCancel || result.errorCode) {
 			return;
 		}
 
 		if (result.assets && result.assets.length > 0) {
 			const selectedImage = result.assets[0];
-
-			setAvatar(selectedImage.uri!);
+			onChange(selectedImage);
 		}
 	};
 
@@ -80,9 +78,9 @@ const Avatar = () => {
 		<View style={styles.container}>
 			<Image
 				source={
-					avatar ? { uri: avatar } : require("./assets/NoPhoto.png")
+					value ? { uri: value.uri } : require("./assets/NoPhoto.png")
 				}
-				style={styles.avatarImage}
+				style={[styles.avatarImage, !!error && styles.errorBorder]}
 			/>
 			<TouchableOpacity
 				style={[styles.iconButton, styles.deleteButton]}
@@ -102,6 +100,8 @@ const Avatar = () => {
 					style={styles.icon}
 				/>
 			</TouchableOpacity>
+
+			{error && <Text style={styles.errorText}>{error}</Text>}
 		</View>
 	);
 };
@@ -141,6 +141,15 @@ const styles = StyleSheet.create({
 	icon: {
 		width: 36,
 		height: 36,
+	},
+	errorBorder: {
+		borderColor: "#FF5A5A",
+	},
+	errorText: {
+		color: "#FF5A5A",
+		fontSize: 12,
+		position: "absolute",
+		bottom: -20,
 	},
 });
 
