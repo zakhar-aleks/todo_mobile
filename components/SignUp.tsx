@@ -5,6 +5,8 @@ import { StyleSheet, View, Alert, ScrollView } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import type { RootStackParamList } from "./NavigationTypes";
 
 const validationSchema = yup.object().shape({
 	email: yup.string().required("Email is required").email("Invalid email"),
@@ -29,7 +31,9 @@ const validationSchema = yup.object().shape({
 		}),
 });
 
-const SignUp = () => {
+type signUpProps = NativeStackScreenProps<RootStackParamList, "Home">;
+
+const SignUp = ({ navigation }: signUpProps) => {
 	const {
 		control,
 		handleSubmit,
@@ -131,7 +135,10 @@ const SignUp = () => {
 
 			<View style={styles.buttonContainer}>
 				<AppButton title="Sign Up" onPress={handleSubmit(onSubmit)} />
-				<AppButton title="Go To Sign In" onPress={() => {}} />
+				<AppButton
+					title="Go To Sign In"
+					onPress={() => navigation.navigate("Sign In")}
+				/>
 			</View>
 		</ScrollView>
 	);
