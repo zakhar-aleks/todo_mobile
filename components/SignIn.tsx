@@ -73,7 +73,7 @@ const SignIn = ({ navigation }: signInProps) => {
 				/>
 			</View>
 			<View style={styles.buttonContainer}>
-				<AppButton title="Sign Up" onPress={handleSubmit(onSubmit)} />
+				<AppButton title="Sign In" onPress={handleSubmit(onSubmit)} />
 				<AppButton
 					title="Go To Sign Up"
 					onPress={() => navigation.navigate("Sign Up")}
