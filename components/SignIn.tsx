@@ -1,7 +1,6 @@
-import AppButton from "./AppButton";
-import Avatar from "./Avatar";
+import { Alert, ScrollView, StyleSheet, Image, Text, View } from "react-native";
 import Input from "./Input";
-import { StyleSheet, View, Alert, ScrollView } from "react-native";
+import AppButton from "./AppButton";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -10,30 +9,15 @@ import type { RootStackParamList } from "./NavigationTypes";
 
 const validationSchema = yup.object().shape({
 	email: yup.string().required("Email is required").email("Invalid email"),
-	name: yup.string().required("Name is required").min(2, "Min 2 chars"),
 	password: yup
 		.string()
 		.required("Password is required")
 		.min(8, "Min 8 chars"),
-	repeatPassword: yup
-		.string()
-		.required("Please repeat password")
-		.oneOf([yup.ref("password")], "Passwords must match"),
-	avatar: yup
-		.mixed()
-		.nullable()
-		.test("fileType", "Unsupported file format", value => {
-			if (!value) return true;
-
-			return ["image/jpeg", "image/png", "image/jpg"].includes(
-				(value as File).type,
-			);
-		}),
 });
 
-type signUpProps = NativeStackScreenProps<RootStackParamList, "Home">;
+type signInProps = NativeStackScreenProps<RootStackParamList, "Home">;
 
-const SignUp = ({ navigation }: signUpProps) => {
+const SignIn = ({ navigation }: signInProps) => {
 	const {
 		control,
 		handleSubmit,
@@ -42,10 +26,7 @@ const SignUp = ({ navigation }: signUpProps) => {
 		resolver: yupResolver(validationSchema),
 		defaultValues: {
 			email: "",
-			name: "",
 			password: "",
-			repeatPassword: "",
-			avatar: null,
 		},
 	});
 
@@ -58,18 +39,8 @@ const SignUp = ({ navigation }: signUpProps) => {
 			style={{ flex: 1, backgroundColor: "#6871EE" }}
 			contentContainerStyle={styles.container}
 		>
-			<Controller
-				control={control}
-				name="avatar"
-				render={({ field: { onChange, value } }) => (
-					<Avatar
-						value={value ?? null}
-						onChange={onChange}
-						error={errors.avatar?.message as string}
-					/>
-				)}
-			/>
-
+			<Image source={require("./assets/Logo.png")} style={styles.logo} />
+			<Text style={styles.welcomeText}>Welcome!</Text>
 			<View style={styles.inputContainer}>
 				<Controller
 					control={control}
@@ -86,21 +57,6 @@ const SignUp = ({ navigation }: signUpProps) => {
 						/>
 					)}
 				/>
-
-				<Controller
-					control={control}
-					name="name"
-					render={({ field: { onChange, onBlur, value } }) => (
-						<Input
-							label="Name"
-							onBlur={onBlur}
-							onChangeText={onChange}
-							value={value}
-							error={errors.name?.message}
-						/>
-					)}
-				/>
-
 				<Controller
 					control={control}
 					name="password"
@@ -112,32 +68,15 @@ const SignUp = ({ navigation }: signUpProps) => {
 							value={value}
 							error={errors.password?.message}
 							secureTextEntry={true}
-							hasEye={true}
-						/>
-					)}
-				/>
-
-				<Controller
-					control={control}
-					name="repeatPassword"
-					render={({ field: { onChange, onBlur, value } }) => (
-						<Input
-							label="Repeat Password"
-							onBlur={onBlur}
-							onChangeText={onChange}
-							value={value}
-							error={errors.repeatPassword?.message}
-							secureTextEntry={true}
 						/>
 					)}
 				/>
 			</View>
-
 			<View style={styles.buttonContainer}>
-				<AppButton title="Sign Up" onPress={handleSubmit(onSubmit)} />
+				<AppButton title="Sign In" onPress={handleSubmit(onSubmit)} />
 				<AppButton
-					title="Go To Sign In"
-					onPress={() => navigation.navigate("Sign In")}
+					title="Go To Sign Up"
+					onPress={() => navigation.navigate("Sign Up")}
 				/>
 			</View>
 		</ScrollView>
@@ -150,16 +89,30 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		alignItems: "center",
 		backgroundColor: "#6871EE",
-		gap: 30,
+		paddingTop: 78,
 	},
+
 	inputContainer: {
+		marginTop: 101,
 		gap: 11,
-		flexDirection: "column",
 	},
+
 	buttonContainer: {
+		marginTop: 49,
 		gap: 11,
-		flexDirection: "column",
+	},
+
+	welcomeText: {
+		fontSize: 32,
+		fontFamily: "Inter",
+		fontWeight: 700,
+		color: "#FFFFFF",
+	},
+
+	logo: {
+		width: 174,
+		height: 88,
 	},
 });
 
-export default SignUp;
+export default SignIn;
