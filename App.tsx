@@ -1,4 +1,4 @@
-import SignUp from "./components/SignUp";
+import SignIn from "./components/SignIn";
 import { StatusBar, useColorScheme, StyleSheet } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
@@ -10,7 +10,7 @@ const App = () => {
 			<StatusBar
 				barStyle={isDarkMode ? "light-content" : "dark-content"}
 			/>
-			<SignUp />
+			<SignIn />
 		</SafeAreaProvider>
 	);
 };

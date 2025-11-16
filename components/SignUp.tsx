@@ -46,7 +46,6 @@ const SignUp = () => {
 	});
 
 	const onSubmit = (data: any) => {
-		console.log(data);
 		Alert.alert("Form data:", JSON.stringify(data, null, 2));
 	};
 
