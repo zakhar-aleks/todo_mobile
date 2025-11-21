@@ -18,15 +18,21 @@ const signUp = async ({
 }) => {
 	try {
 		const res: axiosRegistrationResponse = await axios.post(
-			"localhost:3000/api/auth/registration/",
+			"http://10.0.2.2:3000/api/auth/registration/",
 			{
 				email,
 				name,
 				password,
 			},
 		);
-		saveToken(res.token);
+		saveToken(res.data.token);
 	} catch (error: postRequestError) {
-		Alert.alert(error);
+		const message =
+			error.response?.data?.message ||
+			error.message ||
+			"Something went wrong";
+		Alert.alert("Error", message);
 	}
 };
+
+export default signUp;
