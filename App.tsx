@@ -5,7 +5,8 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "./components/NavigationTypes";
-
+import { Provider } from "react-redux";
+import { store } from "./components/redux/store.ts";
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const App = () => {
@@ -14,21 +15,23 @@ const App = () => {
 	return (
 		<NavigationContainer>
 			<SafeAreaProvider style={styles.container}>
-				<StatusBar
-					barStyle={isDarkMode ? "light-content" : "dark-content"}
-				/>
-				<Stack.Navigator>
-					<Stack.Screen
-						name="Sign In"
-						component={SignIn}
-						options={{ headerShown: false }}
+				<Provider store={store}>
+					<StatusBar
+						barStyle={isDarkMode ? "light-content" : "dark-content"}
 					/>
-					<Stack.Screen
-						name="Sign Up"
-						component={SignUp}
-						options={{ headerShown: false }}
-					/>
-				</Stack.Navigator>
+					<Stack.Navigator>
+						<Stack.Screen
+							name="Sign In"
+							component={SignIn}
+							options={{ headerShown: false }}
+						/>
+						<Stack.Screen
+							name="Sign Up"
+							component={SignUp}
+							options={{ headerShown: false }}
+						/>
+					</Stack.Navigator>
+				</Provider>
 			</SafeAreaProvider>
 		</NavigationContainer>
 	);

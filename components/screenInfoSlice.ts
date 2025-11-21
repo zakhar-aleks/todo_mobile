@@ -1,10 +1,10 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
 interface ScreenInfoState {
-	value: string;
+	value: boolean;
 }
 const initialState: ScreenInfoState = {
-	value: "NotLoading",
+	value: false,
 };
 
 export const screenInfoSlice = createSlice({
@@ -12,13 +12,13 @@ export const screenInfoSlice = createSlice({
 	initialState,
 	reducers: {
 		setLoading: state => {
-			state.value = "Loading";
+			state.value = true;
 		},
 		setNotLoading: state => {
-			state.value = "NotLoading";
+			state.value = false;
 		},
 
-		incrementByAmount: (state, action: PayloadAction<string>) => {
+		incrementByAmount: (state, action: PayloadAction<boolean>) => {
 			state.value = action.payload;
 		},
 	},
