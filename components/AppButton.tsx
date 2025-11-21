@@ -3,13 +3,15 @@ import { Pressable, Text, StyleSheet } from "react-native";
 
 interface AppButtonProps {
 	title: string;
+	disabled: boolean;
 	onPress: () => void;
 }
 
-const AppButton = ({ title, onPress }: AppButtonProps) => {
+const AppButton = ({ title, disabled, onPress }: AppButtonProps) => {
 	return (
 		<Pressable
 			onPress={onPress}
+			disabled={disabled}
 			style={({ pressed }) => [
 				styles.container,
 				pressed && styles.pressed,

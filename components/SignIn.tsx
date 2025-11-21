@@ -5,7 +5,9 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import type { RootStackParamList } from "./NavigationTypes";
+import type { RootStackParamList } from "./types/NavigationTypes";
+import { useLoginMutation } from "./store/tokenApi";
+import { useState } from "react";
 
 const validationSchema = yup.object().shape({
 	email: yup.string().required("Email is required").email("Invalid email"),
@@ -15,9 +17,11 @@ const validationSchema = yup.object().shape({
 		.min(8, "Min 8 chars"),
 });
 
-type signInProps = NativeStackScreenProps<RootStackParamList, "Home">;
+type signInProps = NativeStackScreenProps<RootStackParamList, "Sign In">;
 
 const SignIn = ({ navigation }: signInProps) => {
+	const [login, { isLoading }] = useLoginMutation();
+	const [isEnabled, setIsEnabled] = useState<boolean>(true);
 	const {
 		control,
 		handleSubmit,
@@ -30,8 +34,15 @@ const SignIn = ({ navigation }: signInProps) => {
 		},
 	});
 
-	const onSubmit = (data: any) => {
-		Alert.alert("Form data:", JSON.stringify(data, null, 2));
+	const onSubmit = async (data: any) => {
+		try {
+			const res = await login(data).unwrap();
+			Alert.alert(res.token);
+		} catch (err: any) {
+			console.error("Registration failed", err?.data?.error);
+			const msg = err?.data?.error || "Could not login";
+			Alert.alert("Error", msg);
+		}
 	};
 
 	return (
@@ -73,9 +84,14 @@ const SignIn = ({ navigation }: signInProps) => {
 				/>
 			</View>
 			<View style={styles.buttonContainer}>
-				<AppButton title="Sign In" onPress={handleSubmit(onSubmit)} />
+				<AppButton
+					title="Sign In"
+					disabled={isLoading}
+					onPress={handleSubmit(onSubmit)}
+				/>
 				<AppButton
 					title="Go To Sign Up"
+					disabled={isLoading}
 					onPress={() => navigation.navigate("Sign Up")}
 				/>
 			</View>

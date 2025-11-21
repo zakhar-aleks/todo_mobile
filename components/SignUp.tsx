@@ -6,7 +6,8 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import type { RootStackParamList } from "./NavigationTypes";
+import type { RootStackParamList } from "./types/NavigationTypes";
+import { useRegistrationMutation } from "./store/tokenApi";
 
 const validationSchema = yup.object().shape({
 	email: yup.string().required("Email is required").email("Invalid email"),
@@ -31,9 +32,10 @@ const validationSchema = yup.object().shape({
 		}),
 });
 
-type signUpProps = NativeStackScreenProps<RootStackParamList, "Home">;
+type signUpProps = NativeStackScreenProps<RootStackParamList, "Sign Up">;
 
 const SignUp = ({ navigation }: signUpProps) => {
+	const [register, { isLoading }] = useRegistrationMutation();
 	const {
 		control,
 		handleSubmit,
@@ -49,8 +51,17 @@ const SignUp = ({ navigation }: signUpProps) => {
 		},
 	});
 
-	const onSubmit = (data: any) => {
-		Alert.alert("Form data:", JSON.stringify(data, null, 2));
+	const onSubmit = async (data: any) => {
+		try {
+			const { repeatPassword, ...registrationData } = data;
+
+			const res = await register(registrationData).unwrap();
+			Alert.alert(res.token);
+		} catch (err: any) {
+			console.error("Registration failed", err?.data?.error);
+			const msg = err?.data?.error || "Could not register";
+			Alert.alert("Error", msg);
+		}
 	};
 
 	return (
@@ -134,9 +145,14 @@ const SignUp = ({ navigation }: signUpProps) => {
 			</View>
 
 			<View style={styles.buttonContainer}>
-				<AppButton title="Sign Up" onPress={handleSubmit(onSubmit)} />
+				<AppButton
+					title="Sign Up"
+					disabled={isLoading}
+					onPress={handleSubmit(onSubmit)}
+				/>
 				<AppButton
 					title="Go To Sign In"
+					disabled={isLoading}
 					onPress={() => navigation.navigate("Sign In")}
 				/>
 			</View>

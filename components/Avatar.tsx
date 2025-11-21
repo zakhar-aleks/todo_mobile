@@ -108,12 +108,12 @@ const Avatar = ({ value, onChange, error }: AvatarProps) => {
 
 const styles = StyleSheet.create({
 	container: {
-		width: 140,
+		width: 120,
 		height: 120,
-		position: "relative",
 		alignSelf: "center",
 		marginVertical: 30,
 	},
+
 	avatarImage: {
 		width: 120,
 		height: 120,
@@ -126,30 +126,44 @@ const styles = StyleSheet.create({
 		width: 36,
 		height: 36,
 		borderRadius: 18,
+		backgroundColor: "#FFFFFF",
 		justifyContent: "center",
 		alignItems: "center",
 		elevation: 5,
+		shadowColor: "#000",
+		shadowOffset: { width: 0, height: 2 },
+		shadowOpacity: 0.2,
+		shadowRadius: 4,
 	},
+
 	deleteButton: {
 		bottom: 0,
-		left: 0,
+		left: -10,
 	},
+
 	editButton: {
 		bottom: 0,
-		right: 20,
+		right: -10,
 	},
+
 	icon: {
 		width: 36,
 		height: 36,
+		resizeMode: "contain",
 	},
+
 	errorBorder: {
 		borderColor: "#FF5A5A",
+		borderWidth: 1,
 	},
+
 	errorText: {
 		color: "#FF5A5A",
 		fontSize: 12,
 		position: "absolute",
 		bottom: -20,
+		width: "100%",
+		textAlign: "center",
 	},
 });
 
