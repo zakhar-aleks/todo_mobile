@@ -7,7 +7,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "./types/NavigationTypes";
-import { useRegistrationMutation } from "./store/tokenApi";
+import { useRegistrationMutation } from "./store/TokenApi";
 import { ApiError, AssetFile } from "./types/AuthComponentTypes";
 
 const validationSchema = yup.object().shape({

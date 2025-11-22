@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import { tokenApi } from "./tokenApi";
+import { tokenApi } from "./TokenApi";
 import { tokenState } from "../types/StoreInterface";
 
 const initialState: tokenState = {
