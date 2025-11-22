@@ -6,7 +6,7 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import type { RootStackParamList } from "./NavigationTypes";
+import type { RootStackParamList } from "./types/NavigationTypes";
 
 const validationSchema = yup.object().shape({
 	email: yup.string().required("Email is required").email("Invalid email"),

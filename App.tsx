@@ -4,7 +4,7 @@ import { StatusBar, useColorScheme, StyleSheet } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import type { RootStackParamList } from "./components/NavigationTypes";
+import type { RootStackParamList } from "./components/types/NavigationTypes";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 

@@ -1,0 +1,30 @@
+import { createSlice } from "@reduxjs/toolkit";
+import type { PayloadAction } from "@reduxjs/toolkit";
+import { tokenApi } from "./TokenApi";
+import { tokenState } from "../types/StoreInterface";
+
+const initialState: tokenState = {
+	value: null,
+};
+
+const tokenSlice = createSlice({
+	name: "token",
+	initialState,
+	reducers: {
+		setToken(state: tokenState, action: PayloadAction<string>) {
+			state.value = action.payload;
+		},
+	},
+
+	extraReducers: builder => {
+		builder.addMatcher(
+			tokenApi.endpoints.registration.matchFulfilled,
+			(state, action) => {
+				state.value = action.payload.token;
+			},
+		);
+	},
+});
+
+export const { setToken } = tokenSlice.actions;
+export default tokenSlice.reducer;
