@@ -2,11 +2,13 @@ import AppButton from "./AppButton";
 import Avatar from "./Avatar";
 import Input from "./Input";
 import { StyleSheet, View, Alert, ScrollView } from "react-native";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "./types/NavigationTypes";
+import { useRegistrationMutation } from "./store/tokenApi";
+import { ApiError, AssetFile } from "./types/AuthComponentTypes";
 
 const validationSchema = yup.object().shape({
 	email: yup.string().required("Email is required").email("Invalid email"),
@@ -24,22 +26,26 @@ const validationSchema = yup.object().shape({
 		.nullable()
 		.test("fileType", "Unsupported file format", value => {
 			if (!value) return true;
-
 			return ["image/jpeg", "image/png", "image/jpg"].includes(
-				(value as File).type,
+				(value as AssetFile).type,
 			);
 		}),
 });
 
-type signUpProps = NativeStackScreenProps<RootStackParamList, "Home">;
+type signUpProps = NativeStackScreenProps<RootStackParamList, "Sign Up">;
+type SignUpSchemaType = yup.InferType<typeof validationSchema>;
+type SignUpFormData = Omit<SignUpSchemaType, "avatar"> & {
+	avatar?: any;
+};
 
 const SignUp = ({ navigation }: signUpProps) => {
+	const [register, { isLoading }] = useRegistrationMutation();
 	const {
 		control,
 		handleSubmit,
 		formState: { errors },
-	} = useForm({
-		resolver: yupResolver(validationSchema),
+	} = useForm<SignUpFormData>({
+		resolver: yupResolver(validationSchema) as any,
 		defaultValues: {
 			email: "",
 			name: "",
@@ -49,14 +55,30 @@ const SignUp = ({ navigation }: signUpProps) => {
 		},
 	});
 
-	const onSubmit = (data: any) => {
-		Alert.alert("Form data:", JSON.stringify(data, null, 2));
+	const onSubmit: SubmitHandler<SignUpFormData> = async data => {
+		try {
+			const { repeatPassword, avatar, ...rest } = data;
+
+			const registrationData = {
+				...rest,
+				avatar: (avatar as any) || undefined,
+			};
+
+			await register(registrationData).unwrap();
+		} catch (err) {
+			const apiError = err as ApiError;
+
+			console.error("Registration failed", apiError?.data?.error);
+			const msg = apiError?.data?.error || "Could not register";
+			Alert.alert("Error", msg);
+		}
 	};
 
 	return (
 		<ScrollView
 			style={{ flex: 1, backgroundColor: "#6871EE" }}
 			contentContainerStyle={styles.container}
+			keyboardShouldPersistTaps="handled"
 		>
 			<Controller
 				control={control}
@@ -134,9 +156,14 @@ const SignUp = ({ navigation }: signUpProps) => {
 			</View>
 
 			<View style={styles.buttonContainer}>
-				<AppButton title="Sign Up" onPress={handleSubmit(onSubmit)} />
+				<AppButton
+					title="Sign Up"
+					disabled={isLoading}
+					onPress={handleSubmit(onSubmit)}
+				/>
 				<AppButton
 					title="Go To Sign In"
+					disabled={isLoading}
 					onPress={() => navigation.navigate("Sign In")}
 				/>
 			</View>
