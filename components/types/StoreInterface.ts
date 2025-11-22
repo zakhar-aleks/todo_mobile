@@ -17,6 +17,16 @@ export interface registrationResult {
 	user: user;
 }
 
+export interface loginInput {
+	email: string;
+	password: string;
+}
+
+export interface loginResult {
+	token: string;
+	user: user;
+}
+
 export interface tokenState {
 	value: string | null;
 }

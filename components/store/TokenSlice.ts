@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import { tokenApi } from "./TokenApi";
+import { tokenApi } from "./tokenApi";
 import { tokenState } from "../types/StoreInterface";
 
 const initialState: tokenState = {
@@ -17,12 +17,19 @@ const tokenSlice = createSlice({
 	},
 
 	extraReducers: builder => {
-		builder.addMatcher(
-			tokenApi.endpoints.registration.matchFulfilled,
-			(state, action) => {
-				state.value = action.payload.token;
-			},
-		);
+		builder
+			.addMatcher(
+				tokenApi.endpoints.registration.matchFulfilled,
+				(state, action) => {
+					state.value = action.payload.token;
+				},
+			)
+			.addMatcher(
+				tokenApi.endpoints.login.matchFulfilled,
+				(state, action) => {
+					state.value = action.payload.token;
+				},
+			);
 	},
 });
 
