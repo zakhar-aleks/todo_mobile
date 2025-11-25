@@ -1,11 +1,13 @@
 import { Alert, ScrollView, StyleSheet, Image, Text, View } from "react-native";
 import Input from "./Input";
 import AppButton from "./AppButton";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import type { RootStackParamList } from "./NavigationTypes";
+import type { RootStackParamList } from "./types/NavigationTypes";
+import { useLoginMutation } from "./store/TokenApi";
+import { ApiError } from "./types/AuthComponentTypes";
 
 const validationSchema = yup.object().shape({
 	email: yup.string().required("Email is required").email("Invalid email"),
@@ -15,14 +17,17 @@ const validationSchema = yup.object().shape({
 		.min(8, "Min 8 chars"),
 });
 
-type signInProps = NativeStackScreenProps<RootStackParamList, "Home">;
+type signInProps = NativeStackScreenProps<RootStackParamList, "Sign In">;
+type SignInFormData = yup.InferType<typeof validationSchema>;
 
 const SignIn = ({ navigation }: signInProps) => {
+	const [login, { isLoading }] = useLoginMutation();
+
 	const {
 		control,
 		handleSubmit,
 		formState: { errors },
-	} = useForm({
+	} = useForm<SignInFormData>({
 		resolver: yupResolver(validationSchema),
 		defaultValues: {
 			email: "",
@@ -30,14 +35,23 @@ const SignIn = ({ navigation }: signInProps) => {
 		},
 	});
 
-	const onSubmit = (data: any) => {
-		Alert.alert("Form data:", JSON.stringify(data, null, 2));
+	const onSubmit: SubmitHandler<SignInFormData> = async data => {
+		try {
+			await login(data).unwrap();
+		} catch (err: any) {
+			const apiError = err as ApiError;
+
+			console.error("Registration failed", apiError?.data?.error);
+			const msg = apiError?.data?.error || "Could not login";
+			Alert.alert("Error", msg);
+		}
 	};
 
 	return (
 		<ScrollView
 			style={{ flex: 1, backgroundColor: "#6871EE" }}
 			contentContainerStyle={styles.container}
+			keyboardShouldPersistTaps="handled"
 		>
 			<Image source={require("./assets/Logo.png")} style={styles.logo} />
 			<Text style={styles.welcomeText}>Welcome!</Text>
@@ -73,9 +87,14 @@ const SignIn = ({ navigation }: signInProps) => {
 				/>
 			</View>
 			<View style={styles.buttonContainer}>
-				<AppButton title="Sign In" onPress={handleSubmit(onSubmit)} />
+				<AppButton
+					title="Sign In"
+					disabled={isLoading}
+					onPress={handleSubmit(onSubmit)}
+				/>
 				<AppButton
 					title="Go To Sign Up"
+					disabled={isLoading}
 					onPress={() => navigation.navigate("Sign Up")}
 				/>
 			</View>
