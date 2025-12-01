@@ -1,4 +1,3 @@
-import { Platform } from "react-native";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { TokenService } from "../services/TokenService";
 import {
