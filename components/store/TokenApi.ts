@@ -8,11 +8,7 @@ import {
 	registrationResult,
 } from "../types/StoreInterface";
 
-export const BASE_URL = Platform.select({
-	android: "http://10.0.2.2:3000/api/auth/",
-	ios: "http://localhost:3000/api/auth/",
-	default: "http://localhost:3000/api/auth/",
-});
+export const BASE_URL = "https://todo-backend-rpf2.onrender.com/api/auth/";
 
 export const tokenApi = createApi({
 	reducerPath: "tokenApi",

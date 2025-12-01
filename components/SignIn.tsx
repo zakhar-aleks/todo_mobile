@@ -38,6 +38,8 @@ const SignIn = ({ navigation }: signInProps) => {
 	const onSubmit: SubmitHandler<SignInFormData> = async data => {
 		try {
 			await login(data).unwrap();
+
+			navigation.navigate("Tasks");
 		} catch (err: any) {
 			const apiError = err as ApiError;
 
