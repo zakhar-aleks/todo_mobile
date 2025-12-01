@@ -4,16 +4,10 @@ import { StatusBar, useColorScheme, StyleSheet } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-<<<<<<< HEAD
-import type { RootStackParamList } from "./components/NavigationTypes";
-import { Provider } from "react-redux";
-import { store } from "./components/redux/store.ts";
-=======
 import type { RootStackParamList } from "./components/types/NavigationTypes";
 import { Provider } from "react-redux";
-import { store } from "./components/store/store";
-
->>>>>>> c7245fa1b015d28cc682707d324a08a7f2a78a9a
+import { store } from "./components/store/store.ts";
+import Tasks from "./components/Tasks.tsx";
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const App = () => {
@@ -21,13 +15,8 @@ const App = () => {
 
 	return (
 		<NavigationContainer>
-<<<<<<< HEAD
 			<SafeAreaProvider style={styles.container}>
 				<Provider store={store}>
-=======
-			<Provider store={store}>
-				<SafeAreaProvider style={styles.container}>
->>>>>>> c7245fa1b015d28cc682707d324a08a7f2a78a9a
 					<StatusBar
 						barStyle={isDarkMode ? "light-content" : "dark-content"}
 					/>
@@ -42,14 +31,14 @@ const App = () => {
 							component={SignUp}
 							options={{ headerShown: false }}
 						/>
+						<Stack.Screen
+							name="Tasks"
+							component={Tasks}
+							options={{ headerShown: false }}
+						/>
 					</Stack.Navigator>
-<<<<<<< HEAD
 				</Provider>
 			</SafeAreaProvider>
-=======
-				</SafeAreaProvider>
-			</Provider>
->>>>>>> c7245fa1b015d28cc682707d324a08a7f2a78a9a
 		</NavigationContainer>
 	);
 };

@@ -65,6 +65,8 @@ const SignUp = ({ navigation }: signUpProps) => {
 			};
 
 			await register(registrationData).unwrap();
+
+			navigation.navigate("Tasks");
 		} catch (err) {
 			const apiError = err as ApiError;
 
