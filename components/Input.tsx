@@ -37,7 +37,6 @@ const Input = ({ label, hasEye = false, error, ...props }: InputProps) => {
 					</TouchableOpacity>
 				)}
 			</View>
-			{/* Display the error message */}
 			{error && <Text style={styles.errorText}>{error}</Text>}
 		</View>
 	);
