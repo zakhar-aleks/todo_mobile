@@ -10,11 +10,12 @@ import {
 	Text,
 } from "react-native";
 import AppButton from "./AppButton";
+import { useGetProfileQuery } from "./store/ProfileApi";
 
 const Profile = () => {
 	const errors = "";
-	const [value, setValue] = useState(null);
-
+	//const [value, setValue] = useState(null);
+	const { data: profile, isLoading } = useGetProfileQuery();
 	return (
 		<ScrollView
 			style={{ flex: 1, backgroundColor: "#f0f0f0" }}
@@ -34,7 +35,7 @@ const Profile = () => {
 				</Text>
 			</View>
 			<Avatar
-				value={null}
+				value={profile?.avatar ? { uri: profile?.avatar } : null}
 				onChange={() => null}
 				error={errors as string}
 			/>
@@ -42,6 +43,7 @@ const Profile = () => {
 				<Text style={styles.text}>Email</Text>
 				<View style={styles.inputWrapper}>
 					<TextInput
+						value={profile?.email}
 						style={styles.input}
 						placeholderTextColor="#999"
 					/>{" "}
@@ -49,6 +51,7 @@ const Profile = () => {
 				<Text style={styles.text}>Name</Text>
 				<View style={styles.inputWrapper}>
 					<TextInput
+						value={profile?.name}
 						style={styles.input}
 						placeholderTextColor="#999"
 					/>
@@ -88,6 +91,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		color: "#FFFFFF",
 		height: "100%",
+		//width: "100%",
 	},
 	inputWrapper: {
 		flexDirection: "row",
