@@ -20,6 +20,7 @@ const App = () => {
 					<StatusBar
 						barStyle={isDarkMode ? "light-content" : "dark-content"}
 					/>
+
 					<Stack.Navigator>
 						<Stack.Screen
 							name="Sign In"

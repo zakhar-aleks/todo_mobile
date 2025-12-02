@@ -1,7 +1,13 @@
 import AppButton from "./AppButton";
 import Avatar from "./Avatar";
 import Input from "./Input";
-import { StyleSheet, View, Alert, ScrollView } from "react-native";
+import {
+	StyleSheet,
+	View,
+	Alert,
+	ScrollView,
+	ActivityIndicator,
+} from "react-native";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -169,6 +175,17 @@ const SignUp = ({ navigation }: signUpProps) => {
 					onPress={() => navigation.navigate("Sign In")}
 				/>
 			</View>
+			{isLoading ? (
+				<View
+					style={{
+						flex: 1,
+						justifyContent: "center",
+						alignItems: "center",
+					}}
+				>
+					<ActivityIndicator size="large" color="#f0f0f6ff" />
+				</View>
+			) : null}
 		</ScrollView>
 	);
 };

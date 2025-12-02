@@ -31,6 +31,35 @@ export interface tokenState {
 	value: string | null;
 }
 
+export interface profileState {
+	profile: {
+		email: string;
+		name: string;
+		avatar?: string;
+	};
+}
+
+export interface getProfileResult {
+	email: string;
+	name: string;
+	avatar?: string;
+}
+
+export interface updateProfileResult {
+	email: string;
+	name: string;
+	avatar?: string;
+}
+
+export interface updateProfileInput {
+	name: string;
+	avatar?: string;
+}
+
+export interface deleteProfileAvatarResult {
+	deleted: boolean;
+}
+
 export interface Task {
 	id: string;
 	title: string;

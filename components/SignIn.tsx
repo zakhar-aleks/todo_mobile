@@ -1,4 +1,12 @@
-import { Alert, ScrollView, StyleSheet, Image, Text, View } from "react-native";
+import {
+	Alert,
+	ScrollView,
+	StyleSheet,
+	Image,
+	Text,
+	View,
+	ActivityIndicator,
+} from "react-native";
 import Input from "./Input";
 import AppButton from "./AppButton";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
@@ -99,6 +107,17 @@ const SignIn = ({ navigation }: signInProps) => {
 					disabled={isLoading}
 					onPress={() => navigation.navigate("Sign Up")}
 				/>
+				{isLoading ? (
+					<View
+						style={{
+							//flex: 1,
+							justifyContent: "center",
+							alignItems: "center",
+						}}
+					>
+						<ActivityIndicator size="large" color="#f0f0f6ff" />
+					</View>
+				) : null}
 			</View>
 		</ScrollView>
 	);
