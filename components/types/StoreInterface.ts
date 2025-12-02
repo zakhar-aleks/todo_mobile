@@ -59,3 +59,17 @@ export interface updateProfileInput {
 export interface deleteProfileAvatarResult {
 	deleted: boolean;
 }
+
+export interface Task {
+	id: string;
+	title: string;
+	description?: string;
+	done: boolean;
+	files?: [id: string, image: string, taskId: string];
+}
+
+export interface taskState {
+	tasks: Task[];
+}
+
+export type getTasksResult = Task[];
