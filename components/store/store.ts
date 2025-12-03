@@ -18,6 +18,6 @@ export const store = configureStore({
 	middleware: getDefaultMiddleware =>
 		getDefaultMiddleware()
 			.concat(tokenApi.middleware)
-			.concat(profileApi.middleware),
+			.concat(profileApi.middleware)
 			.concat(taskApi.middleware),
 });

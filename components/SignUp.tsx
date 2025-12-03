@@ -46,6 +46,7 @@ type SignUpFormData = Omit<SignUpSchemaType, "avatar"> & {
 
 const SignUp = ({ navigation }: signUpProps) => {
 	const [register, { isLoading }] = useRegistrationMutation();
+
 	const {
 		control,
 		handleSubmit,
@@ -70,9 +71,11 @@ const SignUp = ({ navigation }: signUpProps) => {
 				avatar: (avatar as any) || undefined,
 			};
 
+			Alert.alert(registrationData.avatar);
+
 			await register(registrationData).unwrap();
 
-			navigation.navigate("Tasks");
+			navigation.navigate("Profile");
 		} catch (err) {
 			const apiError = err as ApiError;
 
