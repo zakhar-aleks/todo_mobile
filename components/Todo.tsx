@@ -1,15 +1,68 @@
-import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
+import { Text, View, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import DeleteIcon from "./assets/DeleteIcon";
 import EditIcon from "./assets/EditIcon";
 import { useDeleteTaskMutation } from "./store/TaskApi";
+import { RootStackParamList } from "./types/NavigationTypes";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useNavigation } from "@react-navigation/native";
 
 interface TodoProps {
 	title: string;
 	id: string;
 }
 
+interface ApiError {
+	status?: number;
+	data?: {
+		error?: string;
+		errors?: string[];
+	};
+}
+
+type NavigationType = NativeStackNavigationProp<RootStackParamList>;
+
 const Todo = ({ title, id }: TodoProps) => {
 	const [deleteTask, { isLoading, error }] = useDeleteTaskMutation();
+	const navigation = useNavigation<NavigationType>();
+
+	const handleDeleteError = (err: ApiError) => {
+		if (err.status === 401) {
+			navigation.navigate("Sign In");
+			return;
+		}
+
+		let errorMessage = "An unexpected error occurred";
+
+		if (err.data?.errors && Array.isArray(err.data.errors)) {
+			errorMessage = err.data.errors.join("\n");
+		} else if (err.data?.error) {
+			errorMessage = err.data.error;
+		}
+
+		Alert.alert("Error", errorMessage);
+	};
+
+	const showConfirmDialog = () => {
+		Alert.alert("Delete Todo", "Are you sure?", [
+			{
+				text: "Cancel",
+				onPress: () => console.log("Deletion cancelled"),
+				style: "cancel",
+			},
+			{
+				text: "OK",
+				onPress: async () => {
+					try {
+						await deleteTask({ taskId: id }).unwrap();
+
+						console.log("Task deleted successfully");
+					} catch (err: any) {
+						handleDeleteError(err);
+					}
+				},
+			},
+		]);
+	};
 
 	return (
 		<View style={styles.card}>
@@ -20,7 +73,7 @@ const Todo = ({ title, id }: TodoProps) => {
 			<View style={styles.buttonsContainer}>
 				<TouchableOpacity
 					style={styles.iconButton}
-					onPress={() => deleteTask({ taskId: id })}
+					onPress={() => showConfirmDialog()}
 				>
 					<DeleteIcon />
 				</TouchableOpacity>
