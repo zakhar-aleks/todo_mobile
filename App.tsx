@@ -9,6 +9,7 @@ import { Provider } from "react-redux";
 import { store } from "./components/store/store.ts";
 import Tasks from "./components/Tasks.tsx";
 import Profile from "./components/Profile.tsx";
+import AddTask from "./components/AddTask.tsx";
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const App = () => {
@@ -41,6 +42,11 @@ const App = () => {
 						<Stack.Screen
 							name="Profile"
 							component={Profile}
+							options={{ headerShown: false }}
+						/>
+						<Stack.Screen
+							name="Add Task"
+							component={AddTask}
 							options={{ headerShown: false }}
 						/>
 					</Stack.Navigator>

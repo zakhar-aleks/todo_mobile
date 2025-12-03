@@ -9,7 +9,7 @@ import {
 
 export const BASE_URL = "https://todo-backend-rpf2.onrender.com/api/auth/";
 
-export const tokenApi = createApi({
+export const authApi = createApi({
 	reducerPath: "tokenApi",
 	baseQuery: fetchBaseQuery({
 		baseUrl: BASE_URL,
@@ -52,4 +52,4 @@ export const tokenApi = createApi({
 	}),
 });
 
-export const { useRegistrationMutation, useLoginMutation } = tokenApi;
+export const { useRegistrationMutation, useLoginMutation } = authApi;

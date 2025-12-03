@@ -2,7 +2,6 @@ import {
 	Alert,
 	ScrollView,
 	StyleSheet,
-	Image,
 	Text,
 	View,
 	ActivityIndicator,
@@ -14,7 +13,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "./types/NavigationTypes";
-import { useLoginMutation } from "./store/TokenApi";
+import { useLoginMutation } from "./store/AuthApi";
 import { ApiError } from "./types/AuthComponentTypes";
 import Logo from "./assets/Logo";
 
@@ -111,7 +110,6 @@ const SignIn = ({ navigation }: signInProps) => {
 				{isLoading ? (
 					<View
 						style={{
-							//flex: 1,
 							justifyContent: "center",
 							alignItems: "center",
 						}}

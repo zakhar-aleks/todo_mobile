@@ -3,5 +3,6 @@ export type RootStackParamList = {
 	"Sign In": undefined;
 	"Sign Up": undefined;
 	Tasks: undefined;
+	"Add Task": undefined;
 	Profile: undefined;
 };

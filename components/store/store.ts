@@ -1,7 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import tokenReducer from "./TokenSlice";
 import profileReducer from "./ProfileSlice";
-import { tokenApi } from "./TokenApi";
+import { authApi } from "./AuthApi";
 import { profileApi } from "./ProfileApi";
 import taskReducer from "./TaskSlice";
 import { taskApi } from "./TaskApi";
@@ -9,7 +9,7 @@ import { taskApi } from "./TaskApi";
 export const store = configureStore({
 	reducer: {
 		tokenReducer,
-		[tokenApi.reducerPath]: tokenApi.reducer,
+		[authApi.reducerPath]: authApi.reducer,
 		profileReducer,
 		[profileApi.reducerPath]: profileApi.reducer,
 		taskReducer,
@@ -17,7 +17,7 @@ export const store = configureStore({
 	},
 	middleware: getDefaultMiddleware =>
 		getDefaultMiddleware()
-			.concat(tokenApi.middleware)
+			.concat(authApi.middleware)
 			.concat(profileApi.middleware)
 			.concat(taskApi.middleware),
 });

@@ -9,8 +9,12 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useGetTasksQuery } from "./store/TaskApi";
 import Todo from "./Todo";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { RootStackParamList } from "./types/NavigationTypes";
 
-const Tasks = () => {
+type TasksProps = NativeStackScreenProps<RootStackParamList, "Tasks">;
+
+const Tasks = ({ navigation }: TasksProps) => {
 	const { data: tasks, isLoading, error } = useGetTasksQuery();
 	const insets = useSafeAreaInsets();
 
@@ -29,6 +33,7 @@ const Tasks = () => {
 			<View style={styles.topRow}>
 				<Text style={styles.helloText}>Hello there</Text>
 				<Pressable
+					onPress={() => navigation.navigate("Add Task")}
 					style={({ pressed }) => [
 						styles.buttonContainer,
 						pressed && styles.pressed,
