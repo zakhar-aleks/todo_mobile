@@ -1,21 +1,24 @@
-import { useState } from "react";
 import Avatar from "./Avatar";
-
 import {
 	StyleSheet,
 	View,
-	Alert,
 	ScrollView,
 	TextInput,
 	Text,
+	Alert,
 } from "react-native";
 import AppButton from "./AppButton";
 import { useGetProfileQuery } from "./store/ProfileApi";
+import { TokenService } from "./services/TokenService";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { RootStackParamList } from "./types/NavigationTypes";
 
-const Profile = () => {
+type ProfileProps = NativeStackScreenProps<RootStackParamList, "Profile">;
+
+const Profile = ({ navigation }: ProfileProps) => {
 	const errors = "";
-	//const [value, setValue] = useState(null);
 	const { data: profile, isLoading } = useGetProfileQuery();
+
 	return (
 		<ScrollView
 			style={{ flex: 1, backgroundColor: "#f0f0f0" }}
@@ -46,7 +49,7 @@ const Profile = () => {
 						value={profile?.email}
 						style={styles.input}
 						placeholderTextColor="#999"
-					/>{" "}
+					/>
 				</View>
 				<Text style={styles.text}>Name</Text>
 				<View style={styles.inputWrapper}>
@@ -64,8 +67,12 @@ const Profile = () => {
 					/>
 					<AppButton
 						title={"Logout"}
-						disabled={true}
-						onPress={() => null}
+						disabled={false}
+						onPress={() => {
+							TokenService.deleteToken();
+
+							navigation.navigate("Sign In");
+						}}
 					/>
 				</View>
 			</View>
@@ -89,9 +96,8 @@ const styles = StyleSheet.create({
 	},
 	input: {
 		flex: 1,
-		color: "#FFFFFF",
+		color: "#000000",
 		height: "100%",
-		//width: "100%",
 	},
 	inputWrapper: {
 		flexDirection: "row",
@@ -116,7 +122,8 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		width: "100%",
 		minHeight: 100,
-		borderRadius: 17,
+		borderBottomLeftRadius: 17,
+		borderBottomRightRadius: 17,
 		backgroundColor: "#6871ee",
 	},
 });

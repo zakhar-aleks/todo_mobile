@@ -8,6 +8,7 @@ import type { RootStackParamList } from "./components/types/NavigationTypes";
 import { Provider } from "react-redux";
 import { store } from "./components/store/store.ts";
 import Tasks from "./components/Tasks.tsx";
+import Profile from "./components/Profile.tsx";
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const App = () => {
@@ -35,6 +36,11 @@ const App = () => {
 						<Stack.Screen
 							name="Tasks"
 							component={Tasks}
+							options={{ headerShown: false }}
+						/>
+						<Stack.Screen
+							name="Profile"
+							component={Profile}
 							options={{ headerShown: false }}
 						/>
 					</Stack.Navigator>
