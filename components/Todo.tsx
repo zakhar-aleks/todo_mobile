@@ -1,4 +1,6 @@
 import { Text, View, StyleSheet, TouchableOpacity, Image } from "react-native";
+import DeleteIcon from "./assets/DeleteIcon";
+import EditIcon from "./assets/EditIcon";
 
 const Todo = ({ title }: { title: string }) => {
 	return (
@@ -9,17 +11,10 @@ const Todo = ({ title }: { title: string }) => {
 			</Text>
 			<View style={styles.buttonsContainer}>
 				<TouchableOpacity style={styles.iconButton}>
-					<Image
-						source={require("./assets/DeleteIcon.png")}
-						style={{ width: 30, height: 30 }}
-					/>
+					<DeleteIcon />
 				</TouchableOpacity>
-
 				<TouchableOpacity style={styles.iconButton}>
-					<Image
-						source={require("./assets/EditIcon.png")}
-						style={{ width: 30, height: 30 }}
-					/>
+					<EditIcon />
 				</TouchableOpacity>
 			</View>
 		</View>

@@ -5,7 +5,6 @@ import {
 	ActivityIndicator,
 	Pressable,
 	StyleSheet,
-	StatusBar,
 } from "react-native";
 import { useGetTasksQuery } from "./store/TaskApi";
 import Todo from "./Todo";

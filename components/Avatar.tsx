@@ -9,6 +9,9 @@ import {
 	Text,
 } from "react-native";
 import { launchImageLibrary, Asset } from "react-native-image-picker";
+import DeleteIcon from "./assets/DeleteIcon";
+import EditIcon from "./assets/EditIcon";
+import NoPhoto from "./assets/NoPhoto";
 
 const getGalleryPermission = () => {
 	if (Platform.OS === "ios") {
@@ -76,29 +79,25 @@ const Avatar = ({ value, onChange, error }: AvatarProps) => {
 
 	return (
 		<View style={styles.container}>
-			<Image
-				source={
-					value ? { uri: value.uri } : require("./assets/NoPhoto.png")
-				}
-				style={[styles.avatarImage, !!error && styles.errorBorder]}
-			/>
+			{value ? (
+				<Image
+					source={{ uri: value.uri }}
+					style={[styles.avatarImage, !!error && styles.errorBorder]}
+				/>
+			) : (
+				<NoPhoto />
+			)}
 			<TouchableOpacity
 				style={[styles.iconButton, styles.deleteButton]}
 				onPress={handleDeletePress}
 			>
-				<Image
-					source={require("./assets/DeleteIcon.png")}
-					style={styles.icon}
-				/>
+				<DeleteIcon />
 			</TouchableOpacity>
 			<TouchableOpacity
 				style={[styles.iconButton, styles.editButton]}
 				onPress={handleEditPress}
 			>
-				<Image
-					source={require("./assets/EditIcon.png")}
-					style={styles.icon}
-				/>
+				<EditIcon />
 			</TouchableOpacity>
 
 			{error && <Text style={styles.errorText}>{error}</Text>}
