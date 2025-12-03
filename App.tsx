@@ -45,7 +45,7 @@ const App = () => {
 							options={{ headerShown: false }}
 						/>
 						<Stack.Screen
-							name="Add Tasks"
+							name="Add Task"
 							component={AddTask}
 							options={{ headerShown: false }}
 						/>

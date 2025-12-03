@@ -14,17 +14,39 @@ interface InputProps extends TextInputProps {
 	label: string;
 	hasEye?: boolean;
 	error?: string;
+	borderColor?: string;
+	textColor?: string;
+	inputTextColor?: string;
 }
 
-const Input = ({ label, hasEye = false, error, ...props }: InputProps) => {
+const Input = ({
+	label,
+	hasEye = false,
+	error,
+	borderColor,
+	textColor,
+	inputTextColor,
+	...props
+}: InputProps) => {
 	const [isSecure, setIsSecure] = useState(props.secureTextEntry);
 
 	return (
 		<View>
-			<Text style={styles.text}>{label}</Text>
-			<View style={[styles.inputWrapper, !!error && styles.errorBorder]}>
+			<Text style={[styles.text, textColor && { color: textColor }]}>
+				{label}
+			</Text>
+			<View
+				style={[
+					styles.inputWrapper,
+					borderColor && { borderColor: borderColor },
+					!!error && styles.errorBorder,
+				]}
+			>
 				<TextInput
-					style={styles.input}
+					style={[
+						styles.input,
+						inputTextColor && { color: inputTextColor },
+					]}
 					{...props}
 					secureTextEntry={hasEye ? isSecure : props.secureTextEntry}
 					placeholderTextColor="#999"
