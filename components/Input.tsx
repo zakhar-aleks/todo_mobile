@@ -8,6 +8,7 @@ import {
 	Image,
 	TextInputProps,
 } from "react-native";
+import PasswordEye from "./assets/PasswordEye";
 
 interface InputProps extends TextInputProps {
 	label: string;
@@ -30,10 +31,7 @@ const Input = ({ label, hasEye = false, error, ...props }: InputProps) => {
 				/>
 				{hasEye && (
 					<TouchableOpacity onPress={() => setIsSecure(!isSecure)}>
-						<Image
-							source={require("./assets/PasswordEye.png")}
-							style={{ width: 24, height: 24 }}
-						/>
+						<PasswordEye />
 					</TouchableOpacity>
 				)}
 			</View>

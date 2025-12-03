@@ -16,6 +16,7 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "./types/NavigationTypes";
 import { useLoginMutation } from "./store/TokenApi";
 import { ApiError } from "./types/AuthComponentTypes";
+import Logo from "./assets/Logo";
 
 const validationSchema = yup.object().shape({
 	email: yup.string().required("Email is required").email("Invalid email"),
@@ -63,7 +64,7 @@ const SignIn = ({ navigation }: signInProps) => {
 			contentContainerStyle={styles.container}
 			keyboardShouldPersistTaps="handled"
 		>
-			<Image source={require("./assets/Logo.png")} style={styles.logo} />
+			<Logo />
 			<Text style={styles.welcomeText}>Welcome!</Text>
 			<View style={styles.inputContainer}>
 				<Controller
