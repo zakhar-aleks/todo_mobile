@@ -1,5 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import {
+	createTaskInput,
+	createTaskResult,
 	deleteTaskInput,
 	deleteTaskResult,
 	getTasksResult,
@@ -31,6 +33,14 @@ export const taskApi = createApi({
 				body: credentials,
 			}),
 			providesTags: ["Task"],
+		}),
+		createTask: builder.mutation<createTaskResult, createTaskInput>({
+			query: credentials => ({
+				url: "/",
+				method: "POST",
+				body: credentials,
+			}),
+			invalidatesTags: ["Task"],
 		}),
 		deleteTask: builder.mutation<deleteTaskResult, deleteTaskInput>({
 			query: ({ taskId, ...credentials }) => ({

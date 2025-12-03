@@ -74,6 +74,24 @@ export interface taskState {
 
 export type getTasksResult = Task[];
 
+export interface createTaskInput {
+	title: string;
+	description?: string;
+	files?: string[] | null;
+}
+
+export interface File {
+	id: string;
+	image: string;
+	taskId: string;
+}
+
+export interface createTaskResult {
+	title: string;
+	description?: string;
+	files?: File[] | null;
+}
+
 export interface deleteTaskInput {
 	taskId: string;
 	credentials?: string;
