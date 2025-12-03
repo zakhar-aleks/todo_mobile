@@ -73,3 +73,12 @@ export interface taskState {
 }
 
 export type getTasksResult = Task[];
+
+export interface deleteTaskInput {
+	taskId: string;
+	credentials?: string;
+}
+
+export interface deleteTaskResult {
+	deleted: true;
+}

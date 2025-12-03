@@ -42,7 +42,9 @@ const Tasks = () => {
 				<FlatList
 					data={tasks}
 					keyExtractor={item => item.id}
-					renderItem={({ item }) => <Todo title={item.title} />}
+					renderItem={({ item }) => (
+						<Todo title={item.title} id={item.id} />
+					)}
 				/>
 			</View>
 		</View>

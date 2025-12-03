@@ -1,5 +1,9 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { getTasksResult } from "../types/StoreInterface";
+import {
+	deleteTaskInput,
+	deleteTaskResult,
+	getTasksResult,
+} from "../types/StoreInterface";
 import { TokenService } from "../services/TokenService";
 
 export const BASE_URL = "https://todo-backend-rpf2.onrender.com/api/tasks/";
@@ -18,6 +22,7 @@ export const taskApi = createApi({
 			return headers;
 		},
 	}),
+	tagTypes: ["Task"],
 	endpoints: builder => ({
 		getTasks: builder.query<getTasksResult, void>({
 			query: credentials => ({
@@ -25,8 +30,17 @@ export const taskApi = createApi({
 				method: "GET",
 				body: credentials,
 			}),
+			providesTags: ["Task"],
+		}),
+		deleteTask: builder.mutation<deleteTaskResult, deleteTaskInput>({
+			query: ({ taskId, ...credentials }) => ({
+				url: `/${taskId}`,
+				method: "DELETE",
+				body: credentials,
+			}),
+			invalidatesTags: ["Task"],
 		}),
 	}),
 });
 
-export const { useGetTasksQuery } = taskApi;
+export const { useGetTasksQuery, useDeleteTaskMutation } = taskApi;

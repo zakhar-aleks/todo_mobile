@@ -1,8 +1,16 @@
-import { Text, View, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
 import DeleteIcon from "./assets/DeleteIcon";
 import EditIcon from "./assets/EditIcon";
+import { useDeleteTaskMutation } from "./store/TaskApi";
 
-const Todo = ({ title }: { title: string }) => {
+interface TodoProps {
+	title: string;
+	id: string;
+}
+
+const Todo = ({ title, id }: TodoProps) => {
+	const [deleteTask, { isLoading, error }] = useDeleteTaskMutation();
+
 	return (
 		<View style={styles.card}>
 			<TouchableOpacity style={styles.checkbox} />
@@ -10,7 +18,10 @@ const Todo = ({ title }: { title: string }) => {
 				{title}
 			</Text>
 			<View style={styles.buttonsContainer}>
-				<TouchableOpacity style={styles.iconButton}>
+				<TouchableOpacity
+					style={styles.iconButton}
+					onPress={() => deleteTask({ taskId: id })}
+				>
 					<DeleteIcon />
 				</TouchableOpacity>
 				<TouchableOpacity style={styles.iconButton}>
