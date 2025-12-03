@@ -2,7 +2,6 @@ import { useSelector } from "react-redux";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import * as Keychain from "react-native-keychain";
 import { Alert, ScrollView, StyleSheet, Image, Text, View } from "react-native";
-import saveToken from "./saveToken";
 
 type postRequestError = any | unknown | AxiosError;
 type axiosRegistrationResponse = any | AxiosResponse;
@@ -25,7 +24,6 @@ const signUp = async ({
 				password,
 			},
 		);
-		saveToken(res.data.token);
 	} catch (error: postRequestError) {
 		const message =
 			error.response?.data?.message ||

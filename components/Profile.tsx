@@ -12,71 +12,102 @@ import { useGetProfileQuery } from "./store/ProfileApi";
 import { TokenService } from "./services/TokenService";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "./types/NavigationTypes";
+import { useEffect, useState } from "react";
+import Navigation from "./Navigation";
 
 type ProfileProps = NativeStackScreenProps<RootStackParamList, "Profile">;
 
 const Profile = ({ navigation }: ProfileProps) => {
-	const errors = "";
-	const { data: profile, isLoading } = useGetProfileQuery();
+	const { data: profile, isLoading, error } = useGetProfileQuery();
+	const [userName, setUserName] = useState(profile?.name);
+	const handleErr = (err: any) => {
+		if (err?.status === 401) {
+			TokenService.deleteToken();
+
+			navigation.navigate("Sign In");
+		} else if (err?.status == 500) {
+			Alert.alert(err.status);
+		}
+	};
+
+	useEffect(() => {
+		handleErr(error);
+	}, [error]);
 
 	return (
-		<ScrollView
-			style={{ flex: 1, backgroundColor: "#f0f0f0" }}
-			contentContainerStyle={styles.container}
-			keyboardShouldPersistTaps="handled"
-		>
-			<View style={styles.header}>
-				<Text
-					style={{
-						color: "white",
-						fontSize: 24,
-						fontFamily: "Inter",
-						fontWeight: 700,
-					}}
-				>
-					Profile
-				</Text>
-			</View>
-			<Avatar
-				value={profile?.avatar ? { uri: profile?.avatar } : null}
-				onChange={() => null}
-				error={errors as string}
-			/>
-			<View style={styles.inputContainer}>
-				<Text style={styles.text}>Email</Text>
-				<View style={styles.inputWrapper}>
-					<TextInput
-						value={profile?.email}
-						style={styles.input}
-						placeholderTextColor="#999"
-					/>
-				</View>
-				<Text style={styles.text}>Name</Text>
-				<View style={styles.inputWrapper}>
-					<TextInput
-						value={profile?.name}
-						style={styles.input}
-						placeholderTextColor="#999"
-					/>
-				</View>
-				<View style={{ marginTop: 85, gap: 15 }}>
-					<AppButton
-						title={"Update"}
-						disabled={true}
-						onPress={() => null}
-					/>
-					<AppButton
-						title={"Logout"}
-						disabled={false}
-						onPress={() => {
-							TokenService.deleteToken();
-
-							navigation.navigate("Sign In");
+		<>
+			<ScrollView
+				style={{ flex: 1, backgroundColor: "#f0f0f0" }}
+				contentContainerStyle={styles.container}
+				keyboardShouldPersistTaps="handled"
+			>
+				<View style={styles.header}>
+					<Text
+						style={{
+							color: "white",
+							fontSize: 24,
+							fontFamily: "Inter",
+							fontWeight: 700,
 						}}
-					/>
+					>
+						Profile
+					</Text>
 				</View>
-			</View>
-		</ScrollView>
+				<Avatar
+					value={profile?.avatar ? { uri: profile?.avatar } : null}
+					onChange={() => null}
+					error={undefined}
+				/>
+				<View style={styles.inputContainer}>
+					<Text style={styles.text}>Email</Text>
+					<View style={styles.inputWrapper}>
+						<TextInput
+							value={profile?.email}
+							editable={false}
+							style={styles.input}
+							placeholderTextColor="#999"
+						/>
+					</View>
+					<Text style={styles.text}>Name</Text>
+					<View style={styles.inputWrapper}>
+						<TextInput
+							value={profile?.name}
+							style={styles.input}
+							placeholderTextColor="#999"
+						/>
+					</View>
+					<View style={{ marginTop: 85, gap: 15 }}>
+						<AppButton
+							title={"Update"}
+							disabled={true}
+							onPress={() => null}
+						/>
+						<AppButton
+							title={"Logout"}
+							disabled={false}
+							onPress={() => {
+								Alert.alert("Logout", "Are you sure?", [
+									{
+										text: "Cancel",
+										onPress: () => {
+											null;
+										},
+									},
+									{
+										text: "Sure",
+										onPress: () => {
+											TokenService.deleteToken();
+											navigation.navigate("Sign In");
+										},
+									},
+								]);
+							}}
+						/>
+					</View>
+				</View>
+			</ScrollView>
+			<Navigation />
+		</>
 	);
 };
 
