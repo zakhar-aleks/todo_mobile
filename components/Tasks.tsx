@@ -11,6 +11,7 @@ import { useGetTasksQuery } from "./store/TaskApi";
 import Todo from "./Todo";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "./types/NavigationTypes";
+import Navigation from "./Navigation";
 
 type TasksProps = NativeStackScreenProps<RootStackParamList, "Tasks">;
 
@@ -61,6 +62,7 @@ const Tasks = ({ navigation }: TasksProps) => {
 				)}
 				contentContainerStyle={styles.listContent}
 			/>
+			<Navigation />
 		</View>
 	);
 };

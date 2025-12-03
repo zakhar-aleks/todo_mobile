@@ -1,7 +1,7 @@
 import * as React from "react";
 import Svg, { G, Mask, Path, Defs, ClipPath, SvgProps } from "react-native-svg";
 
-const TasksNavigationIcon = (props: SvgProps) => {
+const TasksNavigationIcon = ({ color = "#323232", ...props }: SvgProps) => {
 	return (
 		<Svg width={32} height={32} viewBox="0 0 32 32" fill="none" {...props}>
 			<G clipPath="url(#clip0_15_190)">
@@ -21,7 +21,7 @@ const TasksNavigationIcon = (props: SvgProps) => {
 				<G mask="url(#a)">
 					<Path
 						d="M26.36 6.707l1.867 1.866L11.24 25.56l-7.467-7.467 1.867-1.866 5.6 5.6 15.12-15.12zm0-3.774l-15.12 15.12-5.6-5.6L0 18.093l11.24 11.24L32 8.573l-5.64-5.64z"
-						fill="#323232"
+						fill={color}
 					/>
 				</G>
 			</G>
