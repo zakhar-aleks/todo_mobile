@@ -64,21 +64,27 @@ const SignUp = ({ navigation }: signUpProps) => {
 
 	const onSubmit: SubmitHandler<SignUpFormData> = async data => {
 		try {
-			const { repeatPassword, avatar, ...rest } = data;
+			const formData = new FormData();
 
-			const registrationData = {
-				...rest,
-				avatar: (avatar as any) || undefined,
-			};
+			formData.append("email", data.email);
+			formData.append("name", data.name);
+			formData.append("password", data.password);
 
-			Alert.alert(registrationData.avatar);
+			if (data.avatar) {
+				const fileData = {
+					uri: data.avatar.uri,
+					type: data.avatar.type,
+					name: data.avatar.fileName || "avatar.jpg",
+				};
 
-			await register(registrationData).unwrap();
+				formData.append("avatar", fileData as any);
+			}
 
-			navigation.navigate("Profile");
+			await register(formData as any).unwrap();
+
+			navigation.navigate("Tasks");
 		} catch (err) {
 			const apiError = err as ApiError;
-
 			console.error("Registration failed", apiError?.data?.error);
 			const msg = apiError?.data?.error || "Could not register";
 			Alert.alert("Error", msg);
