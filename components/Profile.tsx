@@ -6,9 +6,13 @@ import {
 	TextInput,
 	Text,
 	Alert,
+	ActivityIndicator,
 } from "react-native";
 import AppButton from "./AppButton";
-import { useGetProfileQuery } from "./store/ProfileApi";
+import {
+	useGetProfileQuery,
+	useUpdateProfileMutation,
+} from "./store/ProfileApi";
 import { TokenService } from "./services/TokenService";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "./types/NavigationTypes";
@@ -16,10 +20,31 @@ import { useEffect, useState } from "react";
 import Navigation from "./Navigation";
 
 type ProfileProps = NativeStackScreenProps<RootStackParamList, "Profile">;
-
+interface UserAvatarInterface {
+	uri: string | null;
+	type: string | null;
+	fileName: string | null;
+}
 const Profile = ({ navigation }: ProfileProps) => {
 	const { data: profile, isLoading, error } = useGetProfileQuery();
-	const [userName, setUserName] = useState(profile?.name);
+	const [updateProfile, { isLoading: isUpdate }] = useUpdateProfileMutation();
+	const [userName, setUserName] = useState("");
+	const [userAvatar, setUserAvatar] = useState<UserAvatarInterface>({
+		uri: null,
+		type: null,
+		fileName: null,
+	});
+
+	useEffect(() => {
+		if (profile) {
+			setUserName(profile?.name);
+			setUserAvatar({
+				uri: profile?.avatar || null,
+				type: null,
+				fileName: null,
+			});
+		}
+	}, [profile]);
 	const handleErr = (err: any) => {
 		if (err?.status === 401) {
 			TokenService.deleteToken();
@@ -29,10 +54,37 @@ const Profile = ({ navigation }: ProfileProps) => {
 			Alert.alert(err.status);
 		}
 	};
-
 	useEffect(() => {
 		handleErr(error);
 	}, [error]);
+	const handleUpdate = async () => {
+		try {
+			const formData = new FormData();
+			formData.append("name", userName);
+			//if (userAvatar.uri && userAvatar.uri !== profile?.avatar) {
+			formData.append("avatar", {
+				uri: userAvatar.uri,
+				type: userAvatar.type || "image/jpeg",
+				fileName: userAvatar.fileName || "Avatar.jpg",
+			} as any);
+			//}
+			//Alert.alert(JSON.stringify(formData));
+			await updateProfile(formData).unwrap();
+
+			Alert.alert("Success", "Profile updated!");
+		} catch (error) {
+			Alert.alert("Error", "Failed to update profile");
+		}
+	};
+	if (isLoading === true || !profile) {
+		return (
+			<ActivityIndicator
+				size="large"
+				color="#6871ee"
+				style={{ flex: 1 }}
+			/>
+		);
+	}
 
 	return (
 		<>
@@ -54,8 +106,16 @@ const Profile = ({ navigation }: ProfileProps) => {
 					</Text>
 				</View>
 				<Avatar
-					value={profile?.avatar ? { uri: profile?.avatar } : null}
-					onChange={() => null}
+					value={userAvatar.uri ? { uri: userAvatar.uri } : null}
+					onChange={file => {
+						if (file) {
+							setUserAvatar({
+								uri: file.uri || null,
+								type: file.type || null,
+								fileName: file.fileName || null,
+							});
+						}
+					}}
 					error={undefined}
 				/>
 				<View style={styles.inputContainer}>
@@ -71,16 +131,17 @@ const Profile = ({ navigation }: ProfileProps) => {
 					<Text style={styles.text}>Name</Text>
 					<View style={styles.inputWrapper}>
 						<TextInput
-							value={profile?.name}
+							value={userName}
 							style={styles.input}
+							onChangeText={setUserName}
 							placeholderTextColor="#999"
 						/>
 					</View>
 					<View style={{ marginTop: 85, gap: 15 }}>
 						<AppButton
 							title={"Update"}
-							disabled={true}
-							onPress={() => null}
+							disabled={isUpdate}
+							onPress={handleUpdate}
 						/>
 						<AppButton
 							title={"Logout"}
