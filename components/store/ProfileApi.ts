@@ -3,7 +3,7 @@ import { TokenService } from "../services/TokenService";
 import {
 	deleteProfileAvatarResult,
 	getProfileResult,
-	updateProfileInput,
+	//updateProfileInput,
 	updateProfileResult,
 } from "../types/StoreInterface";
 
@@ -23,6 +23,7 @@ export const profileApi = createApi({
 			return headers;
 		},
 	}),
+	tagTypes: ["Profile"],
 	endpoints: builder => ({
 		getProfile: builder.query<getProfileResult, void>({
 			query: credentials => ({
@@ -30,17 +31,16 @@ export const profileApi = createApi({
 				method: "GET",
 				body: credentials,
 			}),
+			providesTags: ["Profile"],
 		}),
 
-		updateProfile: builder.mutation<
-			updateProfileResult,
-			updateProfileInput
-		>({
+		updateProfile: builder.mutation<updateProfileResult, FormData>({
 			query: credentials => ({
 				url: "/",
 				method: "PUT",
 				body: credentials,
 			}),
+			invalidatesTags: ["Profile"],
 		}),
 
 		deleteProfileAvatar: builder.mutation<deleteProfileAvatarResult, void>({
@@ -49,6 +49,7 @@ export const profileApi = createApi({
 				method: "DELETE",
 				body: credentials,
 			}),
+			invalidatesTags: ["Profile"],
 		}),
 	}),
 });
