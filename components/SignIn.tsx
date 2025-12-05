@@ -96,6 +96,7 @@ const SignIn = ({ navigation }: signInProps) => {
 							value={value}
 							error={errors.password?.message}
 							secureTextEntry={true}
+							hasEye={true}
 						/>
 					)}
 				/>
