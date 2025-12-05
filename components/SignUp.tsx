@@ -17,12 +17,16 @@ import { useRegistrationMutation } from "./store/AuthApi";
 import { ApiError, AssetFile } from "./types/AuthComponentTypes";
 
 const validationSchema = yup.object().shape({
-	email: yup.string().required("Email is required").email("Invalid email"),
+	email: yup
+		.string()
+		.required("Email is required")
+		.matches(/^[^\s@]+@[^\s@]+.[^\s@]+$/, "Invalid email"),
 	name: yup.string().required("Name is required").min(2, "Min 2 chars"),
 	password: yup
 		.string()
 		.required("Password is required")
-		.min(8, "Min 8 chars"),
+		.min(8, "Min 8 chars")
+		.matches(/[a-zA-Z]/, "Password must contain at least one letter"),
 	repeatPassword: yup
 		.string()
 		.required("Please repeat password")

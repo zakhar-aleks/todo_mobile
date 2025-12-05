@@ -18,11 +18,15 @@ import { ApiError } from "./types/AuthComponentTypes";
 import Logo from "./assets/Logo";
 
 const validationSchema = yup.object().shape({
-	email: yup.string().required("Email is required").email("Invalid email"),
+	email: yup
+		.string()
+		.required("Email is required")
+		.matches(/^[^\s@]+@[^\s@]+.[^\s@]+$/, "Invalid email"),
 	password: yup
 		.string()
 		.required("Password is required")
-		.min(8, "Min 8 chars"),
+		.min(8, "Min 8 chars")
+		.matches(/[a-zA-Z]/, "Password must contain at least one letter"),
 });
 
 type signInProps = NativeStackScreenProps<RootStackParamList, "Sign In">;
