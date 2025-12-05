@@ -16,66 +16,87 @@ import {
 import { TokenService } from "./services/TokenService";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "./types/NavigationTypes";
-import { useEffect, useState } from "react";
 import Navigation from "./Navigation";
+import { useForm, Controller, SubmitHandler } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import { useEffect } from "react";
 
 type ProfileProps = NativeStackScreenProps<RootStackParamList, "Profile">;
-interface UserAvatarInterface {
-	uri: string | null;
-	type: string | null;
-	fileName: string | null;
+
+interface AssetFile {
+	uri: string;
+	type: string;
+	fileName?: string;
 }
+
+const validationSchema = yup.object().shape({
+	name: yup.string().required("Name is required").min(2, "Min 2 chars"),
+	avatar: yup
+		.mixed()
+		.nullable()
+		.test("fileType", "Unsupported file format", value => {
+			if (!value) return true;
+			return ["image/jpeg", "image/png", "image/jpg"].includes(
+				(value as AssetFile).type,
+			);
+		}),
+});
+
+type ProfileSchemaType = yup.InferType<typeof validationSchema>;
+
 const Profile = ({ navigation }: ProfileProps) => {
 	const { data: profile, isLoading, error } = useGetProfileQuery();
 	const [updateProfile, { isLoading: isUpdate }] = useUpdateProfileMutation();
-	const [userName, setUserName] = useState("");
-	const [userAvatar, setUserAvatar] = useState<UserAvatarInterface>({
-		uri: null,
-		type: null,
-		fileName: null,
+
+	const {
+		control,
+		handleSubmit,
+		reset,
+		formState: { errors },
+	} = useForm<ProfileSchemaType>({
+		resolver: yupResolver(validationSchema) as any,
+		defaultValues: {
+			name: "",
+			avatar: null,
+		},
 	});
 
 	useEffect(() => {
 		if (profile) {
-			setUserName(profile?.name);
-			setUserAvatar({
-				uri: profile?.avatar || null,
-				type: null,
-				fileName: null,
+			reset({
+				name: profile.name || "",
+				avatar: null,
 			});
 		}
-	}, [profile]);
-	const handleErr = (err: any) => {
-		if (err?.status === 401) {
-			TokenService.deleteToken();
+	}, [profile, reset]);
 
-			navigation.navigate("Sign In");
-		} else if (err?.status == 500) {
-			Alert.alert(err.status);
-		}
-	};
-	useEffect(() => {
-		handleErr(error);
-	}, [error]);
-	const handleUpdate = async () => {
+	const onSubmit: SubmitHandler<ProfileSchemaType> = async data => {
 		try {
 			const formData = new FormData();
-			formData.append("name", userName);
-			//if (userAvatar.uri && userAvatar.uri !== profile?.avatar) {
-			formData.append("avatar", {
-				uri: userAvatar.uri,
-				type: userAvatar.type || "image/jpeg",
-				fileName: userAvatar.fileName || "Avatar.jpg",
-			} as any);
-			//}
-			//Alert.alert(JSON.stringify(formData));
-			await updateProfile(formData).unwrap();
+			formData.append("name", data.name);
+
+			if (data.avatar) {
+				const file = data.avatar as AssetFile;
+				const fileToUpload = {
+					uri: file.uri,
+					type: file.type || "image/jpeg",
+					name: file.fileName || "avatar.jpg",
+				};
+
+				console.log("Uploading new avatar:", fileToUpload);
+				formData.append("avatar", fileToUpload as any);
+			}
+
+			await updateProfile(formData as any).unwrap();
 
 			Alert.alert("Success", "Profile updated!");
 		} catch (error) {
+			console.error(error);
 			Alert.alert("Error", "Failed to update profile");
 		}
 	};
+
 	if (isLoading === true || !profile) {
 		return (
 			<ActivityIndicator
@@ -105,19 +126,33 @@ const Profile = ({ navigation }: ProfileProps) => {
 						Profile
 					</Text>
 				</View>
-				<Avatar
-					value={userAvatar.uri ? { uri: userAvatar.uri } : null}
-					onChange={file => {
-						if (file) {
-							setUserAvatar({
-								uri: file.uri || null,
-								type: file.type || null,
-								fileName: file.fileName || null,
-							});
-						}
+
+				<Controller
+					control={control}
+					name="avatar"
+					render={({ field: { onChange, value } }) => {
+						const imageToShow = value
+							? value
+							: profile?.avatar
+							? { uri: profile.avatar }
+							: null;
+
+						console.log("Profile Avatar URL:", profile?.avatar);
+						console.log(
+							"Image source passed to component:",
+							imageToShow,
+						);
+
+						return (
+							<Avatar
+								value={imageToShow as any}
+								onChange={onChange}
+								error={errors.avatar?.message as string}
+							/>
+						);
 					}}
-					error={undefined}
 				/>
+
 				<View style={styles.inputContainer}>
 					<Text style={styles.text}>Email</Text>
 					<View style={styles.inputWrapper}>
@@ -128,20 +163,46 @@ const Profile = ({ navigation }: ProfileProps) => {
 							placeholderTextColor="#999"
 						/>
 					</View>
+
 					<Text style={styles.text}>Name</Text>
-					<View style={styles.inputWrapper}>
-						<TextInput
-							value={userName}
-							style={styles.input}
-							onChangeText={setUserName}
-							placeholderTextColor="#999"
-						/>
-					</View>
+
+					<Controller
+						control={control}
+						name="name"
+						render={({ field: { onChange, onBlur, value } }) => (
+							<View
+								style={[
+									styles.inputWrapper,
+									errors.name && { borderColor: "red" },
+								]}
+							>
+								<TextInput
+									value={value}
+									style={styles.input}
+									onChangeText={onChange}
+									onBlur={onBlur}
+									placeholderTextColor="#999"
+								/>
+							</View>
+						)}
+					/>
+					{errors.name && (
+						<Text
+							style={{
+								color: "red",
+								fontSize: 12,
+								marginLeft: 5,
+							}}
+						>
+							{errors.name.message}
+						</Text>
+					)}
+
 					<View style={{ marginTop: 85, gap: 15 }}>
 						<AppButton
 							title={"Update"}
 							disabled={isUpdate}
-							onPress={handleUpdate}
+							onPress={handleSubmit(onSubmit)}
 						/>
 						<AppButton
 							title={"Logout"}
@@ -150,9 +211,7 @@ const Profile = ({ navigation }: ProfileProps) => {
 								Alert.alert("Logout", "Are you sure?", [
 									{
 										text: "Cancel",
-										onPress: () => {
-											null;
-										},
+										onPress: () => null,
 									},
 									{
 										text: "Sure",
@@ -180,10 +239,6 @@ const styles = StyleSheet.create({
 		backgroundColor: "#f0f0f0",
 	},
 	inputContainer: {
-		flexDirection: "column",
-	},
-	buttonContainer: {
-		gap: 11,
 		flexDirection: "column",
 	},
 	input: {
