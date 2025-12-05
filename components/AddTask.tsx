@@ -87,7 +87,14 @@ const AddTask = ({ navigation }: AddTaskProps) => {
 			openGallery();
 		} else if (status === RESULTS.DENIED) {
 			const newStatus = await request(permission);
-			if (newStatus === RESULTS.GRANTED) openGallery();
+			if (newStatus === RESULTS.GRANTED) {
+				openGallery();
+			} else {
+				Alert.alert(
+					"Access Denied",
+					"Access to the file system is denied. Enable it in Settings and restart the app",
+				);
+			}
 		} else if (status === RESULTS.BLOCKED) {
 			Alert.alert(
 				"Access Denied",

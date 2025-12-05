@@ -77,7 +77,13 @@ const Todo = ({ title, id }: TodoProps) => {
 				>
 					<DeleteIcon />
 				</TouchableOpacity>
-				<TouchableOpacity style={styles.iconButton}>
+				<TouchableOpacity
+					style={[
+						styles.iconButton,
+						{ opacity: 0.5, filter: "grayscale(100%)" },
+					]}
+					disabled={true}
+				>
 					<EditIcon />
 				</TouchableOpacity>
 			</View>
