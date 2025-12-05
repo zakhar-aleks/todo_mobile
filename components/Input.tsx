@@ -9,6 +9,7 @@ import {
 	TextInputProps,
 } from "react-native";
 import PasswordEye from "./assets/PasswordEye";
+import CrossedEye from "./assets/CrossedEye";
 
 interface InputProps extends TextInputProps {
 	label: string;
@@ -53,7 +54,7 @@ const Input = ({
 				/>
 				{hasEye && (
 					<TouchableOpacity onPress={() => setIsSecure(!isSecure)}>
-						<PasswordEye />
+						{isSecure ? <CrossedEye /> : <PasswordEye />}
 					</TouchableOpacity>
 				)}
 			</View>

@@ -199,7 +199,7 @@ const AddTask = ({ navigation }: AddTaskProps) => {
 									error={errors.title?.message}
 									borderColor="#4D4D4D"
 									textColor="#4D4D4D"
-									inputTextColor="#0000000"
+									inputTextColor="#000000"
 								/>
 							)}
 						/>
@@ -219,7 +219,7 @@ const AddTask = ({ navigation }: AddTaskProps) => {
 									error={errors.description?.message}
 									borderColor="#4D4D4D"
 									textColor="#4D4D4D"
-									inputTextColor="#0000000"
+									inputTextColor="#000000"
 								/>
 							)}
 						/>
