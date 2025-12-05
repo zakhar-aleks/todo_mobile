@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import AppButton from "./AppButton";
 import {
+	useDeleteProfileAvatarMutation,
 	useGetProfileQuery,
 	useUpdateProfileMutation,
 } from "./store/ProfileApi";
@@ -48,6 +49,7 @@ type ProfileSchemaType = yup.InferType<typeof validationSchema>;
 const Profile = ({ navigation }: ProfileProps) => {
 	const { data: profile, isLoading, error } = useGetProfileQuery();
 	const [updateProfile, { isLoading: isUpdate }] = useUpdateProfileMutation();
+	const [deleteAvatar] = useDeleteProfileAvatarMutation();
 
 	const {
 		control,
@@ -148,6 +150,7 @@ const Profile = ({ navigation }: ProfileProps) => {
 								value={imageToShow as any}
 								onChange={onChange}
 								error={errors.avatar?.message as string}
+								onDelete={() => deleteAvatar()}
 							/>
 						);
 					}}

@@ -32,10 +32,12 @@ interface AvatarProps {
 	value: Asset | null;
 	onChange: (file: Asset | null) => void;
 	error?: string;
+	onDelete?: () => void;
 }
 
-const Avatar = ({ value, onChange, error }: AvatarProps) => {
+const Avatar = ({ value, onChange, error, onDelete }: AvatarProps) => {
 	const handleDeletePress = () => {
+		onDelete?.();
 		onChange(null);
 	};
 
