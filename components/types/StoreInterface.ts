@@ -92,6 +92,11 @@ export interface createTaskResult {
 	files?: File[] | null;
 }
 
+export interface changeTaskDoneStatusInput {
+	taskId: string;
+	done: boolean;
+}
+
 export interface deleteTaskInput {
 	taskId: string;
 	credentials?: string;

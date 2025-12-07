@@ -1,10 +1,12 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import {
+	changeTaskDoneStatusInput,
 	createTaskInput,
 	createTaskResult,
 	deleteTaskInput,
 	deleteTaskResult,
 	getTasksResult,
+	Task,
 } from "../types/StoreInterface";
 import { TokenService } from "../services/TokenService";
 
@@ -42,6 +44,16 @@ export const taskApi = createApi({
 			}),
 			invalidatesTags: ["Task"],
 		}),
+		changeTaskDoneStatus: builder.mutation<Task, changeTaskDoneStatusInput>(
+			{
+				query: ({ taskId, ...credentials }) => ({
+					url: `/${taskId}`,
+					method: "PATCH",
+					body: credentials,
+				}),
+				invalidatesTags: ["Task"],
+			},
+		),
 		deleteTask: builder.mutation<deleteTaskResult, deleteTaskInput>({
 			query: ({ taskId, ...credentials }) => ({
 				url: `/${taskId}`,
@@ -55,6 +67,7 @@ export const taskApi = createApi({
 
 export const {
 	useGetTasksQuery,
-	useDeleteTaskMutation,
 	useCreateTaskMutation,
+	useChangeTaskDoneStatusMutation,
+	useDeleteTaskMutation,
 } = taskApi;

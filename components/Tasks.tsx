@@ -57,7 +57,11 @@ const Tasks = ({ navigation }: TasksProps) => {
 				ListHeaderComponent={renderHeader}
 				renderItem={({ item }) => (
 					<View style={styles.todoWrapper}>
-						<Todo title={item.title} id={item.id} />
+						<Todo
+							title={item.title}
+							id={item.id}
+							done={item.done}
+						/>
 					</View>
 				)}
 				contentContainerStyle={styles.listContent}
