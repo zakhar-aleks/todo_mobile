@@ -1,14 +1,19 @@
 import { Text, View, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import DeleteIcon from "./assets/DeleteIcon";
 import EditIcon from "./assets/EditIcon";
-import { useDeleteTaskMutation } from "./store/TaskApi";
+import {
+	useChangeTaskDoneStatusMutation,
+	useDeleteTaskMutation,
+} from "./store/TaskApi";
 import { RootStackParamList } from "./types/NavigationTypes";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
+import CheckBox from "@react-native-community/checkbox";
 
 interface TodoProps {
 	title: string;
 	id: string;
+	done: boolean;
 }
 
 interface ApiError {
@@ -21,8 +26,9 @@ interface ApiError {
 
 type NavigationType = NativeStackNavigationProp<RootStackParamList>;
 
-const Todo = ({ title, id }: TodoProps) => {
+const Todo = ({ title, id, done }: TodoProps) => {
 	const [deleteTask, { isLoading, error }] = useDeleteTaskMutation();
+	const [changeTaskStatus] = useChangeTaskDoneStatusMutation();
 	const navigation = useNavigation<NavigationType>();
 
 	const handleDeleteError = (err: ApiError) => {
@@ -66,8 +72,24 @@ const Todo = ({ title, id }: TodoProps) => {
 
 	return (
 		<View style={styles.card}>
-			<TouchableOpacity style={styles.checkbox} />
-			<Text style={styles.title} numberOfLines={1}>
+			<TouchableOpacity
+				style={styles.checkbox}
+				onPress={() =>
+					changeTaskStatus({
+						taskId: id,
+						done: !done,
+					})
+				}
+			>
+				{done && <View style={styles.innerCheck} />}
+			</TouchableOpacity>
+			<Text
+				style={[
+					styles.title,
+					done && { textDecorationLine: "line-through" },
+				]}
+				numberOfLines={1}
+			>
 				{title}
 			</Text>
 			<View style={styles.buttonsContainer}>
@@ -94,7 +116,6 @@ const Todo = ({ title, id }: TodoProps) => {
 const styles = StyleSheet.create({
 	card: {
 		width: 310,
-		height: 46,
 		backgroundColor: "#FFFFFF",
 		borderRadius: 12,
 		paddingVertical: 14,
@@ -112,6 +133,15 @@ const styles = StyleSheet.create({
 		borderWidth: 2,
 		borderColor: "#000000",
 		marginRight: 12,
+		justifyContent: "center",
+		alignItems: "center",
+	},
+
+	innerCheck: {
+		width: 14,
+		height: 14,
+		backgroundColor: "#000000",
+		borderRadius: 4,
 	},
 
 	title: {
