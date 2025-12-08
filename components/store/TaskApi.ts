@@ -5,6 +5,8 @@ import {
 	createTaskResult,
 	deleteTaskInput,
 	deleteTaskResult,
+	getAllTasksInput,
+	getAllTasksResult,
 	getTaskByIdInput,
 	getTasksResult,
 	Task,
@@ -43,6 +45,27 @@ export const taskApi = createApi({
 				url: `/${taskId}`,
 				method: "GET",
 			}),
+		}),
+		getAllTasks: builder.query<getAllTasksResult, getAllTasksInput>({
+			query: credentials => ({
+				url: "/all",
+				method: "GET",
+				params: credentials,
+			}),
+			serializeQueryArgs: ({ endpointName }) => {
+				return endpointName;
+			},
+			merge: (currentCache, newItems, { arg }) => {
+				if (arg.page === 1) {
+					currentCache.tasks = newItems.tasks;
+				} else {
+					currentCache.tasks.push(...newItems.tasks);
+				}
+			},
+			forceRefetch({ currentArg, previousArg }) {
+				return currentArg?.page !== previousArg?.page;
+			},
+			providesTags: ["Task"],
 		}),
 		createTask: builder.mutation<createTaskResult, createTaskInput>({
 			query: credentials => ({
@@ -87,6 +110,7 @@ export const taskApi = createApi({
 export const {
 	useGetTasksQuery,
 	useGetTaskByIdQuery,
+	useGetAllTasksQuery,
 	useCreateTaskMutation,
 	useUpdateTaskMutation,
 	useChangeTaskDoneStatusMutation,

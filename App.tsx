@@ -12,6 +12,7 @@ import Profile from "./components/Profile.tsx";
 import AddTask from "./components/AddTask.tsx";
 import EditTask from "./components/EditTask.tsx";
 import TaskDetails from "./components/TaskDetails.tsx";
+import CommonTasks from "./components/CommonTasks.tsx";
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const App = () => {
@@ -59,6 +60,11 @@ const App = () => {
 						<Stack.Screen
 							name="Task Details"
 							component={TaskDetails}
+							options={{ headerShown: false }}
+						/>
+						<Stack.Screen
+							name="Common Tasks"
+							component={CommonTasks}
 							options={{ headerShown: false }}
 						/>
 					</Stack.Navigator>

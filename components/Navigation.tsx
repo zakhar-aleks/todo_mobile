@@ -39,10 +39,15 @@ const Navigation = () => {
 				/>
 			</Pressable>
 			<Pressable
-				disabled={true}
-				style={[styles.navItem, styles.disabledItem]}
+				onPress={() => navigation.navigate("Common Tasks")}
+				style={[
+					styles.navItem,
+					isActive("Common Tasks") && styles.activeNavItem,
+				]}
 			>
-				<CommonTasksNavigationIcon color="#000000" />
+				<CommonTasksNavigationIcon
+					color={isActive("Common Tasks") ? "#FFFFFF" : "#000000"}
+				/>
 			</Pressable>
 		</View>
 	);

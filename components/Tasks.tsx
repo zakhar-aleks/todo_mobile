@@ -44,7 +44,15 @@ const Tasks = ({ navigation }: TasksProps) => {
 				</Pressable>
 			</View>
 			<Text style={styles.taskCountText}>
-				You have {tasks?.length || 0} tasks here
+				You have {tasks?.length || 0} task here
+			</Text>
+		</View>
+	);
+
+	const renderEmptyList = () => (
+		<View style={styles.emptyContainer}>
+			<Text style={styles.emptyText}>
+				There are no tasks{"\n"}at the moment
 			</Text>
 		</View>
 	);
@@ -55,6 +63,7 @@ const Tasks = ({ navigation }: TasksProps) => {
 				data={tasks}
 				keyExtractor={item => item.id}
 				ListHeaderComponent={renderHeader}
+				ListEmptyComponent={renderEmptyList}
 				renderItem={({ item }) => (
 					<View style={styles.todoWrapper}>
 						<Pressable
@@ -133,10 +142,25 @@ const styles = StyleSheet.create({
 
 	listContent: {
 		paddingBottom: 100,
+		flexGrow: 1,
 	},
 	todoWrapper: {
 		width: "100%",
 		alignItems: "center",
+	},
+	emptyContainer: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+		paddingHorizontal: 20,
+		marginTop: 50,
+	},
+	emptyText: {
+		fontSize: 20,
+		fontWeight: "bold",
+		color: "#000000",
+		textAlign: "center",
+		lineHeight: 28,
 	},
 });
 
