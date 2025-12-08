@@ -11,6 +11,7 @@ import Tasks from "./components/Tasks.tsx";
 import Profile from "./components/Profile.tsx";
 import AddTask from "./components/AddTask.tsx";
 import EditTask from "./components/EditTask.tsx";
+import TaskDetails from "./components/TaskDetails.tsx";
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const App = () => {
@@ -53,6 +54,11 @@ const App = () => {
 						<Stack.Screen
 							name="Edit Task"
 							component={EditTask}
+							options={{ headerShown: false }}
+						/>
+						<Stack.Screen
+							name="Task Details"
+							component={TaskDetails}
 							options={{ headerShown: false }}
 						/>
 					</Stack.Navigator>
