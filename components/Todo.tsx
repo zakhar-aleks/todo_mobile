@@ -8,7 +8,8 @@ import {
 import { RootStackParamList } from "./types/NavigationTypes";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
-import CheckBox from "@react-native-community/checkbox";
+import { useState } from "react";
+import Checkmark from "./assets/Checkmark";
 
 interface TodoProps {
 	title: string;
@@ -30,6 +31,7 @@ const Todo = ({ title, id, done }: TodoProps) => {
 	const [deleteTask, { isLoading, error }] = useDeleteTaskMutation();
 	const [changeTaskStatus] = useChangeTaskDoneStatusMutation();
 	const navigation = useNavigation<NavigationType>();
+	const [isDone, setIsDone] = useState(done);
 
 	const handleDeleteError = (err: ApiError) => {
 		if (err.status === 401) {
@@ -74,14 +76,20 @@ const Todo = ({ title, id, done }: TodoProps) => {
 		<View style={styles.card}>
 			<TouchableOpacity
 				style={styles.checkbox}
-				onPress={() =>
+				onPress={() => {
+					const newStatus = !isDone;
+					setIsDone(newStatus);
 					changeTaskStatus({
 						taskId: id,
-						done: !done,
-					})
-				}
+						done: newStatus,
+					});
+				}}
 			>
-				{done && <View style={styles.innerCheck} />}
+				{isDone && (
+					<View style={styles.innerCheck}>
+						<Checkmark width={18} height={18} color="#FFFFFF" />
+					</View>
+				)}
 			</TouchableOpacity>
 			<Text
 				style={[
@@ -99,14 +107,12 @@ const Todo = ({ title, id, done }: TodoProps) => {
 				>
 					<DeleteIcon />
 				</TouchableOpacity>
-				<TouchableOpacity
-					style={[
-						styles.iconButton,
-						{ opacity: 0.5, filter: "grayscale(100%)" },
-					]}
-					disabled={true}
-				>
-					<EditIcon />
+				<TouchableOpacity style={[styles.iconButton]}>
+					<EditIcon
+						onPress={() =>
+							navigation.navigate("Edit Task", { taskId: id })
+						}
+					/>
 				</TouchableOpacity>
 			</View>
 		</View>
@@ -129,19 +135,21 @@ const styles = StyleSheet.create({
 	checkbox: {
 		width: 24,
 		height: 24,
-		borderRadius: 8,
+		marginRight: 10,
+		borderRadius: 6,
 		borderWidth: 2,
 		borderColor: "#000000",
-		marginRight: 12,
 		justifyContent: "center",
 		alignItems: "center",
 	},
-
 	innerCheck: {
-		width: 14,
-		height: 14,
-		backgroundColor: "#000000",
-		borderRadius: 4,
+		display: "flex",
+		justifyContent: "center",
+		alignItems: "center",
+		width: 24,
+		height: 24,
+		backgroundColor: "#6871EE",
+		borderRadius: 6,
 	},
 
 	title: {

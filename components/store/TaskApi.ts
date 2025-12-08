@@ -5,12 +5,14 @@ import {
 	createTaskResult,
 	deleteTaskInput,
 	deleteTaskResult,
+	getTaskByIdInput,
 	getTasksResult,
 	Task,
+	updateTaskInput,
 } from "../types/StoreInterface";
 import { TokenService } from "../services/TokenService";
 
-export const BASE_URL = "https://todo-backend-rpf2.onrender.com/api/tasks/";
+export const BASE_URL = "https://todo-backend-rpf2.onrender.com/api/tasks";
 
 export const taskApi = createApi({
 	reducerPath: "taskApi",
@@ -36,6 +38,12 @@ export const taskApi = createApi({
 			}),
 			providesTags: ["Task"],
 		}),
+		getTaskById: builder.query<Task, getTaskByIdInput>({
+			query: ({ taskId, ...credentials }) => ({
+				url: `/${taskId}`,
+				method: "GET",
+			}),
+		}),
 		createTask: builder.mutation<createTaskResult, createTaskInput>({
 			query: credentials => ({
 				url: "/",
@@ -43,6 +51,17 @@ export const taskApi = createApi({
 				body: credentials,
 			}),
 			invalidatesTags: ["Task"],
+		}),
+		updateTask: builder.mutation<Task, updateTaskInput>({
+			query: ({ taskId, credentials }) => ({
+				url: `/${taskId}`,
+				method: "PUT",
+				body: credentials,
+			}),
+			invalidatesTags: (result, error, arg) => [
+				{ type: "Task", id: arg.taskId },
+				"Task",
+			],
 		}),
 		changeTaskDoneStatus: builder.mutation<Task, changeTaskDoneStatusInput>(
 			{
@@ -67,7 +86,9 @@ export const taskApi = createApi({
 
 export const {
 	useGetTasksQuery,
+	useGetTaskByIdQuery,
 	useCreateTaskMutation,
+	useUpdateTaskMutation,
 	useChangeTaskDoneStatusMutation,
 	useDeleteTaskMutation,
 } = taskApi;

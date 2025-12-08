@@ -90,7 +90,7 @@ const Profile = ({ navigation }: ProfileProps) => {
 				formData.append("avatar", fileToUpload as any);
 			}
 
-			await updateProfile(formData as any).unwrap();
+			await updateProfile(formData).unwrap();
 
 			Alert.alert("Success", "Profile updated!");
 		} catch (error) {

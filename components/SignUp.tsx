@@ -84,7 +84,7 @@ const SignUp = ({ navigation }: signUpProps) => {
 				formData.append("avatar", fileData as any);
 			}
 
-			await register(formData as any).unwrap();
+			await register(formData).unwrap();
 
 			navigation.navigate("Tasks");
 		} catch (err) {
