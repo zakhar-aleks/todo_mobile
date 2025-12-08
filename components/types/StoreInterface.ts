@@ -71,6 +71,15 @@ export interface getTaskByIdInput {
 	credentials?: string;
 }
 
+export interface getAllTasksInput {
+	page: number;
+	tasksPerPage: number;
+}
+
+export interface getAllTasksResult {
+	tasks: Task[];
+}
+
 export type createTaskInput = FormData;
 
 export interface File {
