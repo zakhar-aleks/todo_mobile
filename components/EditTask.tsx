@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { check, request, RESULTS, PERMISSIONS } from "react-native-permissions";
 import {
 	Alert,
@@ -8,10 +8,10 @@ import {
 	Text,
 	View,
 	Image,
-	FlatList,
 	StatusBar,
 	ActivityIndicator,
 	TouchableOpacity,
+	ScrollView,
 } from "react-native";
 import { launchImageLibrary, Asset } from "react-native-image-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -29,6 +29,7 @@ import {
 	useGetTaskByIdQuery,
 	useUpdateTaskMutation,
 } from "./store/TaskApi";
+import Checkmark from "./assets/Checkmark";
 
 const validationSchema = yup.object().shape({
 	title: yup.string().required("Title is required").min(2, "Min 2 chars"),
@@ -54,13 +55,16 @@ const EditTask = ({ navigation, route }: EditTaskProps) => {
 	const {
 		data: tasks,
 		isLoading,
-		error,
-	} = useGetTaskByIdQuery({ taskId: taskId });
+		isFetching,
+	} = useGetTaskByIdQuery(
+		{ taskId: taskId },
+		{ refetchOnMountOrArgChange: true },
+	);
 	const [update] = useUpdateTaskMutation();
 	const [deleteTask] = useDeleteTaskMutation();
-	const [serverImages, setServerImages] = React.useState<any[]>([]);
+	const [serverImages, setServerImages] = useState<any[]>([]);
 	const [changeTaskStatus] = useChangeTaskDoneStatusMutation();
-	const [isDone, setIsDone] = React.useState(false);
+	const [isDone, setIsDone] = useState(false);
 
 	const {
 		control,
@@ -77,7 +81,7 @@ const EditTask = ({ navigation, route }: EditTaskProps) => {
 		},
 	});
 
-	React.useEffect(() => {
+	useEffect(() => {
 		if (tasks) {
 			setIsDone(tasks.done);
 			setValue("title", tasks.title);
@@ -89,7 +93,7 @@ const EditTask = ({ navigation, route }: EditTaskProps) => {
 		}
 	}, [tasks, setValue]);
 
-	if (isLoading) {
+	if (isLoading || isFetching) {
 		return (
 			<View
 				style={[
@@ -180,23 +184,33 @@ const EditTask = ({ navigation, route }: EditTaskProps) => {
 			formData.append("title", data.title);
 			formData.append("description", data.description || "");
 
+			const existingIds = serverImages.map(img => img.id);
+			formData.append("existingFileIds", JSON.stringify(existingIds));
+
 			if (data.media && data.media.length > 0) {
 				data.media.forEach(file => {
-					const fileData = {
-						uri: file?.uri,
+					if (!file?.uri) return;
+
+					const fileExtension =
+						file.fileName?.split(".").pop() || "jpg";
+					const uniqueName = `photo_${Date.now()}_${Math.random()
+						.toString(36)
+						.slice(2)}.${fileExtension}`;
+
+					const fileToUpload = {
+						uri:
+							Platform.OS === "android"
+								? file?.uri
+								: file?.uri.replace("file://", ""),
 						type: file?.type || "image/jpeg",
-						name: file?.fileName || `image_${Date.now()}.jpg`,
+						name: uniqueName,
 					};
-					formData.append("files", fileData as any);
+
+					formData.append("files", fileToUpload as any);
 				});
 			}
 
-			serverImages.forEach(file => {
-				formData.append("existingFileIds", file.id);
-			});
-
 			await update({ taskId: taskId, credentials: formData }).unwrap();
-
 			navigation.navigate("Tasks");
 		} catch (err: any) {
 			console.log("FULL ERROR:", JSON.stringify(err, null, 2));
@@ -211,7 +225,6 @@ const EditTask = ({ navigation, route }: EditTaskProps) => {
 			if (err?.data?.errors) {
 				const errorsData = err.data.errors;
 				let errorMsg = "";
-
 				if (Array.isArray(errorsData)) {
 					errorMsg = errorsData.join("\n");
 				} else if (typeof errorsData === "object") {
@@ -219,18 +232,14 @@ const EditTask = ({ navigation, route }: EditTaskProps) => {
 				} else {
 					errorMsg = String(errorsData);
 				}
-
 				Alert.alert("Error", errorMsg);
 				return;
 			}
 
 			if (err?.data?.error) {
 				Alert.alert("Error", JSON.stringify(err.data.error, null, 2));
-
 				return;
 			}
-
-			console.log(err);
 			Alert.alert("Error", "Something went wrong. Please try again.");
 		}
 	};
@@ -246,26 +255,30 @@ const EditTask = ({ navigation, route }: EditTaskProps) => {
 			<StatusBar barStyle="light-content" backgroundColor="#6D61F2" />
 			<SafeAreaView style={styles.headerSafeArea}>
 				<View style={styles.headerContainer}>
+					<View style={styles.headerTitleWrapper}>
+						<Text style={styles.headerTitle}>Edit Task</Text>
+					</View>
 					<Pressable
 						style={styles.backButton}
 						onPress={() => navigation.navigate("Tasks")}
 					>
 						<BackArrow width={24} height={24} color="#FFF" />
 					</Pressable>
-					<Text style={styles.headerTitle}>Edit Task</Text>
-					<View style={{ width: 24 }} />
 					<Pressable
 						onPress={() => {
 							navigation.navigate("Tasks");
 							deleteTask({ taskId: taskId });
 						}}
 					>
-						<Text>delete</Text>
+						<Text style={styles.deleteHeaderText}>delete</Text>
 					</Pressable>
 				</View>
 			</SafeAreaView>
 
-			<View style={styles.contentContainer}>
+			<ScrollView
+				contentContainerStyle={styles.scrollContent}
+				showsVerticalScrollIndicator={false}
+			>
 				<View style={styles.formContainer}>
 					<View style={styles.inputWrapper}>
 						<Controller
@@ -308,47 +321,54 @@ const EditTask = ({ navigation, route }: EditTaskProps) => {
 						/>
 					</View>
 				</View>
-				<TouchableOpacity
-					style={styles.checkbox}
-					onPress={() => {
-						const newStatus = !isDone;
-						setIsDone(newStatus);
 
-						changeTaskStatus({
-							taskId: taskId,
-							done: newStatus,
-						});
-					}}
-				>
-					{isDone && <View style={styles.innerCheck} />}
-				</TouchableOpacity>
-				<View style={styles.mediaContainer}>
-					<FlatList
-						data={allImages}
-						horizontal
-						showsHorizontalScrollIndicator={false}
-						keyExtractor={(item, index) =>
-							(item.id || item.uri) + index
-						}
-						ListHeaderComponent={<AddPhotoButton />}
-						contentContainerStyle={styles.listContent}
-						renderItem={({ item, index }) => (
-							<View style={styles.imageWrapper}>
-								<Image
-									source={{ uri: item.uri }}
-									style={styles.thumbnail}
+				<View style={styles.checkboxContainer}>
+					<Text style={styles.checkboxLabel}>Done</Text>
+					<TouchableOpacity
+						style={styles.checkbox}
+						onPress={() => {
+							const newStatus = !isDone;
+							setIsDone(newStatus);
+							changeTaskStatus({
+								taskId: taskId,
+								done: newStatus,
+							});
+						}}
+					>
+						{isDone && (
+							<View style={styles.innerCheck}>
+								<Checkmark
+									width={18}
+									height={18}
+									color="#FFFFFF"
 								/>
-								<Pressable
-									style={styles.deleteButton}
-									onPress={() => removeImage(index)}
-								>
-									<DeleteIcon />
-								</Pressable>
 							</View>
 						)}
-					/>
+					</TouchableOpacity>
 				</View>
-				<View style={{ flex: 1 }} />
+
+				<View style={styles.imagesGrid}>
+					<AddPhotoButton />
+					{allImages.map((item, index) => (
+						<View
+							key={(item.id || item.uri) + index}
+							style={styles.imageWrapper}
+						>
+							<Image
+								source={{ uri: item.uri }}
+								style={styles.thumbnail}
+							/>
+							<Pressable
+								style={styles.deleteButton}
+								onPress={() => removeImage(index)}
+							>
+								<DeleteIcon color="#6871EE" />
+							</Pressable>
+						</View>
+					))}
+				</View>
+
+				<View style={{ flex: 1, minHeight: 40 }} />
 
 				<Pressable
 					style={[styles.saveBtn, isLoading && { opacity: 0.7 }]}
@@ -361,7 +381,7 @@ const EditTask = ({ navigation, route }: EditTaskProps) => {
 						<Text style={styles.saveBtnText}>Save</Text>
 					)}
 				</Pressable>
-			</View>
+			</ScrollView>
 		</View>
 	);
 };
@@ -382,18 +402,35 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		justifyContent: "space-between",
 		paddingHorizontal: 16,
+		position: "relative",
+	},
+	headerTitleWrapper: {
+		position: "absolute",
+		left: 0,
+		right: 0,
+		top: 0,
+		bottom: 0,
+		justifyContent: "center",
+		alignItems: "center",
+		zIndex: -1,
 	},
 	headerTitle: {
 		fontSize: 20,
 		fontWeight: "bold",
 		color: "#FFFFFF",
 	},
+	deleteHeaderText: {
+		fontSize: 16,
+		color: "#FFFFFF",
+		fontWeight: "400",
+	},
 	backButton: {
 		padding: 5,
 	},
-	contentContainer: {
-		flex: 1,
+	scrollContent: {
 		padding: 20,
+		paddingBottom: 40,
+		flexGrow: 1,
 	},
 	formContainer: {
 		marginBottom: 20,
@@ -404,12 +441,11 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		alignItems: "center",
 	},
-	mediaContainer: {
-		height: 120,
-	},
-	listContent: {
-		alignItems: "center",
-		paddingRight: 10,
+	imagesGrid: {
+		flexDirection: "row",
+		flexWrap: "wrap",
+		alignItems: "flex-start",
+		marginTop: 10,
 	},
 	addPhotoBtn: {
 		width: 100,
@@ -419,6 +455,7 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		alignItems: "center",
 		marginRight: 12,
+		marginBottom: 12,
 		elevation: 2,
 	},
 	addPhotoText: {
@@ -430,6 +467,7 @@ const styles = StyleSheet.create({
 	imageWrapper: {
 		position: "relative",
 		marginRight: 12,
+		marginBottom: 12,
 	},
 	thumbnail: {
 		width: 100,
@@ -460,28 +498,41 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		alignItems: "center",
 		elevation: 3,
+		marginTop: 20,
 	},
 	saveBtnText: {
 		fontSize: 18,
 		fontWeight: "bold",
 		color: "#000",
 	},
+	checkboxContainer: {
+		flexDirection: "row",
+		justifyContent: "flex-end",
+		alignItems: "center",
+		marginBottom: 10,
+	},
+	checkboxLabel: {
+		fontSize: 16,
+		color: "#000000",
+		marginRight: 8,
+	},
 	checkbox: {
 		width: 24,
 		height: 24,
-		borderRadius: 8,
+		borderRadius: 6,
 		borderWidth: 2,
 		borderColor: "#000000",
-		marginRight: 12,
 		justifyContent: "center",
 		alignItems: "center",
 	},
-
 	innerCheck: {
-		width: 14,
-		height: 14,
-		backgroundColor: "#000000",
-		borderRadius: 4,
+		display: "flex",
+		justifyContent: "center",
+		alignItems: "center",
+		width: 24,
+		height: 24,
+		backgroundColor: "#6871EE",
+		borderRadius: 6,
 	},
 });
 

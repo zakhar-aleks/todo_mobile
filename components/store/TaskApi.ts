@@ -12,7 +12,7 @@ import {
 } from "../types/StoreInterface";
 import { TokenService } from "../services/TokenService";
 
-export const BASE_URL = "https://todo-backend-rpf2.onrender.com/api/tasks/";
+export const BASE_URL = "https://todo-backend-rpf2.onrender.com/api/tasks";
 
 export const taskApi = createApi({
 	reducerPath: "taskApi",
@@ -58,7 +58,10 @@ export const taskApi = createApi({
 				method: "PUT",
 				body: credentials,
 			}),
-			invalidatesTags: ["Task"],
+			invalidatesTags: (result, error, arg) => [
+				{ type: "Task", id: arg.taskId },
+				"Task",
+			],
 		}),
 		changeTaskDoneStatus: builder.mutation<Task, changeTaskDoneStatusInput>(
 			{
