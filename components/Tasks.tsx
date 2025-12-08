@@ -57,11 +57,19 @@ const Tasks = ({ navigation }: TasksProps) => {
 				ListHeaderComponent={renderHeader}
 				renderItem={({ item }) => (
 					<View style={styles.todoWrapper}>
-						<Todo
-							title={item.title}
-							id={item.id}
-							done={item.done}
-						/>
+						<Pressable
+							onPress={() =>
+								navigation.navigate("Task Details", {
+									taskId: item.id,
+								})
+							}
+						>
+							<Todo
+								title={item.title}
+								id={item.id}
+								done={item.done}
+							/>
+						</Pressable>
 					</View>
 				)}
 				contentContainerStyle={styles.listContent}

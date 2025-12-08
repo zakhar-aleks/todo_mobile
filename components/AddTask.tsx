@@ -8,9 +8,9 @@ import {
 	Text,
 	View,
 	Image,
-	FlatList,
 	StatusBar,
 	ActivityIndicator,
+	ScrollView,
 } from "react-native";
 import { launchImageLibrary, Asset } from "react-native-image-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -188,8 +188,10 @@ const AddTask = ({ navigation }: AddTaskProps) => {
 					<View style={{ width: 24 }} />
 				</View>
 			</SafeAreaView>
-
-			<View style={styles.contentContainer}>
+			<ScrollView
+				contentContainerStyle={styles.scrollContent}
+				showsVerticalScrollIndicator={false}
+			>
 				<View style={styles.formContainer}>
 					<View style={styles.inputWrapper}>
 						<Controller
@@ -232,33 +234,26 @@ const AddTask = ({ navigation }: AddTaskProps) => {
 						/>
 					</View>
 				</View>
-
 				<View style={styles.mediaContainer}>
-					<FlatList
-						data={selectedImages as Asset[]}
-						horizontal
-						showsHorizontalScrollIndicator={false}
-						keyExtractor={(item, index) =>
-							(item.uri || "img") + index
-						}
-						ListHeaderComponent={<AddPhotoButton />}
-						contentContainerStyle={styles.listContent}
-						renderItem={({ item, index }) => (
-							<View style={styles.imageWrapper}>
-								<Image
-									source={{ uri: item.uri }}
-									style={styles.thumbnail}
-								/>
+					<AddPhotoButton />
 
-								<Pressable
-									style={styles.deleteButton}
-									onPress={() => removeImage(index)}
-								>
-									<DeleteIcon />
-								</Pressable>
-							</View>
-						)}
-					/>
+					{(selectedImages as Asset[]).map((item, index) => (
+						<View
+							key={(item.uri || "img") + index}
+							style={styles.imageWrapper}
+						>
+							<Image
+								source={{ uri: item.uri }}
+								style={styles.thumbnail}
+							/>
+							<Pressable
+								style={styles.deleteButton}
+								onPress={() => removeImage(index)}
+							>
+								<DeleteIcon />
+							</Pressable>
+						</View>
+					))}
 				</View>
 				<View style={{ flex: 1 }} />
 
@@ -273,7 +268,7 @@ const AddTask = ({ navigation }: AddTaskProps) => {
 						<Text style={styles.saveBtnText}>Save</Text>
 					)}
 				</Pressable>
-			</View>
+			</ScrollView>
 		</View>
 	);
 };
@@ -303,8 +298,8 @@ const styles = StyleSheet.create({
 	backButton: {
 		padding: 5,
 	},
-	contentContainer: {
-		flex: 1,
+	scrollContent: {
+		flexGrow: 1,
 		padding: 20,
 	},
 	formContainer: {
@@ -317,11 +312,9 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 	},
 	mediaContainer: {
-		height: 120,
-	},
-	listContent: {
-		alignItems: "center",
-		paddingRight: 10,
+		flexDirection: "row",
+		flexWrap: "wrap",
+		marginBottom: 20,
 	},
 	addPhotoBtn: {
 		width: 100,
@@ -331,6 +324,7 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		alignItems: "center",
 		marginRight: 12,
+		marginBottom: 12,
 		elevation: 2,
 	},
 	addPhotoText: {
@@ -340,8 +334,11 @@ const styles = StyleSheet.create({
 		textAlign: "center",
 	},
 	imageWrapper: {
+		display: "flex",
+		flexWrap: "wrap",
 		position: "relative",
 		marginRight: 12,
+		marginBottom: 12,
 	},
 	thumbnail: {
 		width: 100,
@@ -372,6 +369,7 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		alignItems: "center",
 		elevation: 3,
+		marginTop: 20,
 	},
 	saveBtnText: {
 		fontSize: 18,
