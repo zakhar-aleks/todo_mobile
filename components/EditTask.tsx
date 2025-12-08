@@ -11,6 +11,7 @@ import {
 	FlatList,
 	StatusBar,
 	ActivityIndicator,
+	TouchableOpacity,
 } from "react-native";
 import { launchImageLibrary, Asset } from "react-native-image-picker";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -22,7 +23,12 @@ import DeleteIcon from "./assets/DeleteIcon";
 import BackArrow from "./assets/BackArrow";
 import Input from "./Input";
 import { RootStackParamList } from "./types/NavigationTypes";
-import { useCreateTaskMutation } from "./store/TaskApi";
+import {
+	useChangeTaskDoneStatusMutation,
+	useDeleteTaskMutation,
+	useGetTaskByIdQuery,
+	useUpdateTaskMutation,
+} from "./store/TaskApi";
 
 const validationSchema = yup.object().shape({
 	title: yup.string().required("Title is required").min(2, "Min 2 chars"),
@@ -30,8 +36,8 @@ const validationSchema = yup.object().shape({
 	media: yup.array().of(yup.mixed<Asset>()).notRequired(),
 });
 
-type AddTaskProps = NativeStackScreenProps<RootStackParamList, "Add Task">;
-type AddTaskSchemaType = yup.InferType<typeof validationSchema>;
+type EditTaskProps = NativeStackScreenProps<RootStackParamList, "Edit Task">;
+type EditTaskSchemaType = yup.InferType<typeof validationSchema>;
 
 const getGalleryPermission = () => {
 	if (Platform.OS === "ios") return PERMISSIONS.IOS.PHOTO_LIBRARY;
@@ -43,8 +49,18 @@ const getGalleryPermission = () => {
 	return null;
 };
 
-const AddTask = ({ navigation }: AddTaskProps) => {
-	const [create, { isLoading }] = useCreateTaskMutation();
+const EditTask = ({ navigation, route }: EditTaskProps) => {
+	const { taskId } = route.params;
+	const {
+		data: tasks,
+		isLoading,
+		error,
+	} = useGetTaskByIdQuery({ taskId: taskId });
+	const [update] = useUpdateTaskMutation();
+	const [deleteTask] = useDeleteTaskMutation();
+	const [serverImages, setServerImages] = React.useState<any[]>([]);
+	const [changeTaskStatus] = useChangeTaskDoneStatusMutation();
+	const [isDone, setIsDone] = React.useState(false);
 
 	const {
 		control,
@@ -52,7 +68,7 @@ const AddTask = ({ navigation }: AddTaskProps) => {
 		setValue,
 		watch,
 		formState: { errors },
-	} = useForm<AddTaskSchemaType>({
+	} = useForm<EditTaskSchemaType>({
 		resolver: yupResolver(validationSchema) as any,
 		defaultValues: {
 			title: "",
@@ -60,6 +76,31 @@ const AddTask = ({ navigation }: AddTaskProps) => {
 			media: [],
 		},
 	});
+
+	React.useEffect(() => {
+		if (tasks) {
+			setIsDone(tasks.done);
+			setValue("title", tasks.title);
+			setValue("description", tasks.description || "");
+
+			if (tasks.files && Array.isArray(tasks.files)) {
+				setServerImages(tasks.files);
+			}
+		}
+	}, [tasks, setValue]);
+
+	if (isLoading) {
+		return (
+			<View
+				style={[
+					styles.mainContainer,
+					{ justifyContent: "center", alignItems: "center" },
+				]}
+			>
+				<ActivityIndicator size="large" color="#6871EE" />
+			</View>
+		);
+	}
 
 	const selectedImages = watch("media") || [];
 
@@ -103,15 +144,36 @@ const AddTask = ({ navigation }: AddTaskProps) => {
 		}
 	};
 
+	const displayServerImages = serverImages.map(img => ({
+		...img,
+		uri: img.image,
+		isServer: true,
+	}));
+
+	const displayNewImages = selectedImages.map(img => ({
+		...img,
+		isServer: false,
+	}));
+
+	const allImages = [...displayServerImages, ...displayNewImages];
+
 	const removeImage = (indexToRemove: number) => {
-		const currentImages = watch("media") || [];
-		const filtered = currentImages.filter(
-			(_, index) => index !== indexToRemove,
-		);
-		setValue("media", filtered);
+		if (indexToRemove < serverImages.length) {
+			const updatedServerImages = serverImages.filter(
+				(_, index) => index !== indexToRemove,
+			);
+			setServerImages(updatedServerImages);
+		} else {
+			const newImageIndex = indexToRemove - serverImages.length;
+			const currentNewImages = watch("media") || [];
+			const filtered = currentNewImages.filter(
+				(_, index) => index !== newImageIndex,
+			);
+			setValue("media", filtered);
+		}
 	};
 
-	const onSubmit: SubmitHandler<AddTaskSchemaType> = async data => {
+	const onSubmit: SubmitHandler<EditTaskSchemaType> = async data => {
 		try {
 			const formData = new FormData();
 
@@ -129,10 +191,15 @@ const AddTask = ({ navigation }: AddTaskProps) => {
 				});
 			}
 
-			await create(formData).unwrap();
+			serverImages.forEach(file => {
+				formData.append("existingFileIds", file.id);
+			});
+
+			await update({ taskId: taskId, credentials: formData }).unwrap();
 
 			navigation.navigate("Tasks");
 		} catch (err: any) {
+			console.log("FULL ERROR:", JSON.stringify(err, null, 2));
 			if (err?.status === 401) {
 				navigation.reset({
 					index: 0,
@@ -158,7 +225,8 @@ const AddTask = ({ navigation }: AddTaskProps) => {
 			}
 
 			if (err?.data?.error) {
-				Alert.alert("Error", err.data.error);
+				Alert.alert("Error", JSON.stringify(err.data.error, null, 2));
+
 				return;
 			}
 
@@ -184,8 +252,16 @@ const AddTask = ({ navigation }: AddTaskProps) => {
 					>
 						<BackArrow width={24} height={24} color="#FFF" />
 					</Pressable>
-					<Text style={styles.headerTitle}>Add new task</Text>
+					<Text style={styles.headerTitle}>Edit Task</Text>
 					<View style={{ width: 24 }} />
+					<Pressable
+						onPress={() => {
+							navigation.navigate("Tasks");
+							deleteTask({ taskId: taskId });
+						}}
+					>
+						<Text>delete</Text>
+					</Pressable>
 				</View>
 			</SafeAreaView>
 
@@ -232,14 +308,27 @@ const AddTask = ({ navigation }: AddTaskProps) => {
 						/>
 					</View>
 				</View>
+				<TouchableOpacity
+					style={styles.checkbox}
+					onPress={() => {
+						const newStatus = !isDone;
+						setIsDone(newStatus);
 
+						changeTaskStatus({
+							taskId: taskId,
+							done: newStatus,
+						});
+					}}
+				>
+					{isDone && <View style={styles.innerCheck} />}
+				</TouchableOpacity>
 				<View style={styles.mediaContainer}>
 					<FlatList
-						data={selectedImages as Asset[]}
+						data={allImages}
 						horizontal
 						showsHorizontalScrollIndicator={false}
 						keyExtractor={(item, index) =>
-							(item.uri || "img") + index
+							(item.id || item.uri) + index
 						}
 						ListHeaderComponent={<AddPhotoButton />}
 						contentContainerStyle={styles.listContent}
@@ -249,7 +338,6 @@ const AddTask = ({ navigation }: AddTaskProps) => {
 									source={{ uri: item.uri }}
 									style={styles.thumbnail}
 								/>
-
 								<Pressable
 									style={styles.deleteButton}
 									onPress={() => removeImage(index)}
@@ -378,6 +466,23 @@ const styles = StyleSheet.create({
 		fontWeight: "bold",
 		color: "#000",
 	},
+	checkbox: {
+		width: 24,
+		height: 24,
+		borderRadius: 8,
+		borderWidth: 2,
+		borderColor: "#000000",
+		marginRight: 12,
+		justifyContent: "center",
+		alignItems: "center",
+	},
+
+	innerCheck: {
+		width: 14,
+		height: 14,
+		backgroundColor: "#000000",
+		borderRadius: 4,
+	},
 });
 
-export default AddTask;
+export default EditTask;

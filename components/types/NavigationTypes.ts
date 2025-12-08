@@ -5,4 +5,5 @@ export type RootStackParamList = {
 	Tasks: undefined;
 	"Add Task": undefined;
 	Profile: undefined;
+	"Edit Task": { taskId: string };
 };

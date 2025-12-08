@@ -99,14 +99,12 @@ const Todo = ({ title, id, done }: TodoProps) => {
 				>
 					<DeleteIcon />
 				</TouchableOpacity>
-				<TouchableOpacity
-					style={[
-						styles.iconButton,
-						{ opacity: 0.5, filter: "grayscale(100%)" },
-					]}
-					disabled={true}
-				>
-					<EditIcon />
+				<TouchableOpacity style={[styles.iconButton]}>
+					<EditIcon
+						onPress={() =>
+							navigation.navigate("Edit Task", { taskId: id })
+						}
+					/>
 				</TouchableOpacity>
 			</View>
 		</View>

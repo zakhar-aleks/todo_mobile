@@ -5,8 +5,10 @@ import {
 	createTaskResult,
 	deleteTaskInput,
 	deleteTaskResult,
+	getTaskByIdInput,
 	getTasksResult,
 	Task,
+	updateTaskInput,
 } from "../types/StoreInterface";
 import { TokenService } from "../services/TokenService";
 
@@ -36,10 +38,24 @@ export const taskApi = createApi({
 			}),
 			providesTags: ["Task"],
 		}),
+		getTaskById: builder.query<Task, getTaskByIdInput>({
+			query: ({ taskId, ...credentials }) => ({
+				url: `/${taskId}`,
+				method: "GET",
+			}),
+		}),
 		createTask: builder.mutation<createTaskResult, createTaskInput>({
 			query: credentials => ({
 				url: "/",
 				method: "POST",
+				body: credentials,
+			}),
+			invalidatesTags: ["Task"],
+		}),
+		updateTask: builder.mutation<Task, updateTaskInput>({
+			query: ({ taskId, credentials }) => ({
+				url: `/${taskId}`,
+				method: "PUT",
 				body: credentials,
 			}),
 			invalidatesTags: ["Task"],
@@ -67,7 +83,9 @@ export const taskApi = createApi({
 
 export const {
 	useGetTasksQuery,
+	useGetTaskByIdQuery,
 	useCreateTaskMutation,
+	useUpdateTaskMutation,
 	useChangeTaskDoneStatusMutation,
 	useDeleteTaskMutation,
 } = taskApi;

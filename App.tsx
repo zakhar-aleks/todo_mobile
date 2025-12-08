@@ -10,6 +10,7 @@ import { store } from "./components/store/store.ts";
 import Tasks from "./components/Tasks.tsx";
 import Profile from "./components/Profile.tsx";
 import AddTask from "./components/AddTask.tsx";
+import EditTask from "./components/EditTask.tsx";
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const App = () => {
@@ -47,6 +48,11 @@ const App = () => {
 						<Stack.Screen
 							name="Add Task"
 							component={AddTask}
+							options={{ headerShown: false }}
+						/>
+						<Stack.Screen
+							name="Edit Task"
+							component={EditTask}
 							options={{ headerShown: false }}
 						/>
 					</Stack.Navigator>

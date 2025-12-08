@@ -5,12 +5,7 @@ export interface user {
 	avatar?: string | null;
 }
 
-export interface registrationInput {
-	email: string;
-	name: string;
-	password: string;
-	avatar?: string;
-}
+export type registrationInput = FormData;
 
 export interface registrationResult {
 	token: string;
@@ -51,10 +46,7 @@ export interface updateProfileResult {
 	avatar?: string;
 }
 
-export interface updateProfileInput {
-	name: string;
-	avatar?: string;
-}
+export type updateProfileInput = FormData;
 
 export interface deleteProfileAvatarResult {
 	deleted: boolean;
@@ -65,7 +57,7 @@ export interface Task {
 	title: string;
 	description?: string;
 	done: boolean;
-	files?: [id: string, image: string, taskId: string];
+	files?: File[];
 }
 
 export interface taskState {
@@ -74,11 +66,12 @@ export interface taskState {
 
 export type getTasksResult = Task[];
 
-export interface createTaskInput {
-	title: string;
-	description?: string;
-	files?: string[] | null;
+export interface getTaskByIdInput {
+	taskId: string;
+	credentials?: string;
 }
+
+export type createTaskInput = FormData;
 
 export interface File {
 	id: string;
@@ -90,6 +83,11 @@ export interface createTaskResult {
 	title: string;
 	description?: string;
 	files?: File[] | null;
+}
+
+export interface updateTaskInput {
+	credentials: FormData;
+	taskId: string;
 }
 
 export interface changeTaskDoneStatusInput {
