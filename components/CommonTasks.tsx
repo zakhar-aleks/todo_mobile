@@ -11,7 +11,10 @@ import {
 	Text,
 	StatusBar,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+	SafeAreaView,
+	useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import Navigation from "./Navigation";
 
 type CommonTasksProps = NativeStackScreenProps<
@@ -26,6 +29,8 @@ const CommonTasks = ({ navigation }: CommonTasksProps) => {
 		isLoading,
 		isFetching,
 	} = useGetAllTasksQuery({ page: page, tasksPerPage: 9 });
+	const insets = useSafeAreaInsets();
+	const headerOverlap = insets.top + 15;
 
 	const tasksList = tasksResponse?.tasks || [];
 
@@ -36,17 +41,6 @@ const CommonTasks = ({ navigation }: CommonTasksProps) => {
 
 		setPage(prev => prev + 1);
 	}, [isFetching, isLoading, hasMore]);
-
-	const renderFooter = () => {
-		if (isFetching && page > 1) {
-			return (
-				<View style={styles.footerLoader}>
-					<ActivityIndicator size="small" color="#6871EE" />
-				</View>
-			);
-		}
-		return <View style={{ height: 40 }} />;
-	};
 
 	const renderHeader = () => (
 		<View style={styles.headerWrapper}>
@@ -63,6 +57,14 @@ const CommonTasks = ({ navigation }: CommonTasksProps) => {
 		</View>
 	);
 
+	const renderEmptyList = () => (
+		<View style={styles.emptyContainer}>
+			<Text style={styles.emptyText}>
+				There are no tasks{"\n"}at the moment
+			</Text>
+		</View>
+	);
+
 	if (isLoading) {
 		return (
 			<View style={styles.loadingContainer}>
@@ -74,18 +76,19 @@ const CommonTasks = ({ navigation }: CommonTasksProps) => {
 	return (
 		<View style={styles.mainContainer}>
 			<StatusBar barStyle="light-content" backgroundColor="#6871EE" />
-
+			{renderHeader()}
 			<FlatList
 				data={tasksList}
 				keyExtractor={(item, index) => `${item.id}-${index}`}
-				ListHeaderComponent={renderHeader}
-				stickyHeaderIndices={[0]}
-				contentContainerStyle={styles.listContent}
+				ListEmptyComponent={renderEmptyList}
+				contentContainerStyle={[
+					styles.listContent,
+					{ paddingTop: headerOverlap },
+				]}
 				ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
 				showsVerticalScrollIndicator={false}
 				onEndReached={loadMore}
-				onEndReachedThreshold={0.5}
-				ListFooterComponent={renderFooter}
+				onEndReachedThreshold={0.2}
 				renderItem={({ item }) => (
 					<View style={styles.itemWrapper}>
 						<Pressable style={styles.card}>
@@ -94,7 +97,6 @@ const CommonTasks = ({ navigation }: CommonTasksProps) => {
 					</View>
 				)}
 			/>
-
 			<Navigation />
 		</View>
 	);
@@ -114,6 +116,8 @@ const styles = StyleSheet.create({
 	headerWrapper: {
 		backgroundColor: "#F2F2F2",
 		marginBottom: 10,
+		height: 50,
+		zIndex: 999,
 	},
 	headerSafeArea: {
 		backgroundColor: "#6871EE",
@@ -168,9 +172,24 @@ const styles = StyleSheet.create({
 		color: "#000000",
 	},
 	footerLoader: {
+		height: 60,
 		paddingVertical: 20,
 		alignItems: "center",
 		justifyContent: "center",
+	},
+	emptyContainer: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+		paddingHorizontal: 20,
+		marginTop: 50,
+	},
+	emptyText: {
+		fontSize: 20,
+		fontWeight: "bold",
+		color: "#000000",
+		textAlign: "center",
+		lineHeight: 28,
 	},
 });
 
